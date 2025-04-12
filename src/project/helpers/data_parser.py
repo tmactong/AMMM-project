@@ -31,12 +31,17 @@ def parse(filename: str) -> (int, typing.Dict[int, typing.Dict[int, int]]):
                     raise ValueError("items of row is not compatible with N")
                 else:
                     m.append([int(x) for x in row])
-    if n == 0 or not m:
-        raise IOError("no items found")
-    return n, m
+    if n == 0 or not m or len(m) != n:
+        raise IOError("dat file format error")
+    md = dict(map(lambda x: (x, dict(map(lambda y: (y, 0), range(1, n+1)))), range(1, n + 1)))
+    for i in range(n):
+        for j in range(n):
+            md[i+1][j+1] = m[i][j]
+    return n, md
 
 
 if __name__ == "__main__":
     n,m = parse("../testdata/project.1.dat")
     print(n)
     print(m)
+    print(m[3][2])
