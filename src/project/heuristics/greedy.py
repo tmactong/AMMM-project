@@ -16,15 +16,6 @@ class GreedyHeuristic(HeuristicMethod):
         self.CoveredPairs.append(member_pair[::-1])
 
     def update_candidates(self, member_pair: typing.Tuple[int, int], delete_reverse: bool = False) -> None:
-        """
-        candidates = list()
-        for candidate in self.Candidates:
-            if candidate != new_member_pair and candidate != new_member_pair[::-1]:
-                for member_pair in self.Solution:
-                    if set(member_pair) & set(candidate):
-                        candidates.append(candidate)
-        self.Candidates = candidates
-        """
         self.Candidates.remove(member_pair)
         if delete_reverse and member_pair[::-1] in self.Candidates:
             self.Candidates.remove(member_pair[::-1])
