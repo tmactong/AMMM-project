@@ -4,6 +4,7 @@ from src.project.helpers.cycles_generator import generate_branches
 
 
 class GreedyHeuristic(HeuristicMethod):
+
     CoveredPairs: typing.List[typing.Tuple[int, int]]
 
     def __init__(self, member_count: int, bids: typing.Dict[int, typing.Dict[int, int]]):
@@ -42,18 +43,19 @@ class GreedyHeuristic(HeuristicMethod):
             return sorted(self.Candidates, key=lambda x: self.Bids[x[0]][x[1]], reverse=True)
 
     def _newly_constructed_cycle_members(self, member_pair: typing.Tuple[int, int]) -> typing.Iterable[typing.List[int]]:
+        # print('member_pair:', member_pair)
+        # print('covered pairs:', self.CoveredPairs)
         for branch in generate_branches([member_pair[1]], self.CoveredPairs):
             if member_pair[0] in branch:
-                yield branch
-            #if branch[-1] == member_pair[0]:
-            #    yield branch
+                yield branch[:branch.index(member_pair[0])+1]
 
     def _newly_constructed_cycles(self, member_pair: typing.Tuple[int, int]) -> typing.Iterable[typing.List[int]]:
+        uniq_cycles = list()
         for cycle_members in self._newly_constructed_cycle_members(member_pair):
-            print(cycle_members)
-            yield cycle_members
-            #for pattern in self.CyclePatterns[len(cycle_members)]:
-            #     yield [cycle_members[x - 1] for x in pattern]
+            if cycle_members not in uniq_cycles:
+                # print(cycle_members)
+                uniq_cycles.append(cycle_members)
+                yield cycle_members
 
     def validate_candidate(self, candidate: typing.Tuple[int, int]) -> bool:
         new_cycles = self._newly_constructed_cycles(candidate)
@@ -65,13 +67,14 @@ class GreedyHeuristic(HeuristicMethod):
                 return False
         return True
 
-    def solve(self) -> bool:
+    def _solve(self) -> bool:
         while self.Candidates:
             sorted_candidates = self.sort_candidates_by_quality()
             candidate = sorted_candidates.pop(0)
             feasible = self.validate_candidate(candidate)
             if feasible:
                 self.update_candidates(candidate, delete_reverse=True)
+                print('candidates number:', len(self.Candidates))
                 self.update_covered_pairs(candidate)
                 self.Solution.append(candidate)
                 self.MemberPriorities[candidate[0]][candidate[1]] = 1

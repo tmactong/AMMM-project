@@ -1,6 +1,5 @@
 import typing
 import itertools
-from src.project.helpers.cycles_generator import generate_cycle_patterns
 
 
 class HeuristicMethod:
@@ -11,7 +10,7 @@ class HeuristicMethod:
     Solution: typing.List[typing.Tuple[int, int]]
     MemberPriorities: typing.Dict[typing.Any, typing.Dict[typing.Any, int]]
     Objective: int
-    CyclePatterns: typing.Dict[int, typing.List[typing.List[int]]]
+    Solved: bool
 
     def __init__(self, member_count: int, bids: typing.Dict[int, typing.Dict[int, int]]) -> None:
         self.MemberCount = member_count
@@ -23,13 +22,7 @@ class HeuristicMethod:
                 _, dict(map(lambda _: (_, 0), range(1,member_count+1)))
             ), range(1,member_count+1)))
         self.Objective = 0
-        """
-        self.CyclePatterns = dict()
-        for combination_member_count in range(3, member_count + 1):
-            self.CyclePatterns[combination_member_count] = list(
-                generate_cycle_patterns(list(range(1, combination_member_count + 1)))
-            )
-        """
+        self.Solved = False
 
     def initialize_candidates(self) -> None:
         """
@@ -41,5 +34,8 @@ class HeuristicMethod:
     def update_objective(self, pair: typing.Tuple[int, int]) -> None:
         self.Objective += self.Bids[pair[0]][pair[1]]
 
-    def solve(self) -> bool:
+    def _solve(self) -> bool:
         raise NotImplementedError("Method solve not implemented")
+
+    def solve(self):
+        self.Solved = self._solve()

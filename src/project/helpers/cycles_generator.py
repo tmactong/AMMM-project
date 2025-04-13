@@ -27,7 +27,6 @@ def generate_branches(
     for pair in pairs:
         if pair[0] == branch[-1]:
             continue_search = True
-            # yield from generate_branches(branch + [pair[1]], [x for x in pairs if x != pair and x != pair[::-1]])
             yield from generate_branches(branch + [pair[1]], [x for x in pairs if pair[0] not in x])
     if not continue_search:
         yield branch

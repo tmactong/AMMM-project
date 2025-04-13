@@ -3,7 +3,7 @@ from src.project.helpers import cycles_generator
 def get_tree():
     yield from cycles_generator.generate_branches(
         [3],
-        [(1, 4), (4, 1), (2, 1), (1, 2), (4, 3), (3, 4), (6, 1), (1, 6), (5, 6), (6, 5), (6, 3), (3, 6), (4, 6), (6, 4),
+        [(1, 4), (4, 1), (2, 1), (1, 2), (4, 3), (3, 4), (6, 1), (1, 6), (5, 6), (6, 5), (6, 3), (3, 6), (6, 4), (4, 6),
          (6, 2), (2, 6)]
     )
 
