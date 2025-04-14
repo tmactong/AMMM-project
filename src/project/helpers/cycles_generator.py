@@ -34,7 +34,7 @@ def generate_cycle_patterns(digits: typing.List[int]) -> typing.Iterable[typing.
 
 
 if __name__ == '__main__':
-    n = 6
+    n = 4
     generated_sequences = list(generate_cycle_patterns(list(range(1, 1 + n))))
     print("generated sequences:", len(generated_sequences), generated_sequences)
     # print(get_combinations(5, 2))
