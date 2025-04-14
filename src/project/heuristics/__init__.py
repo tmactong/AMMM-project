@@ -10,7 +10,6 @@ class HeuristicMethod:
     Solution: typing.List[typing.Tuple[int, int]]
     MemberPriorities: typing.Dict[typing.Any, typing.Dict[typing.Any, int]]
     Objective: int
-    Solved: bool
 
     def __init__(self, member_count: int, bids: typing.Dict[int, typing.Dict[int, int]]) -> None:
         self.MemberCount = member_count
@@ -22,7 +21,6 @@ class HeuristicMethod:
                 _, dict(map(lambda _: (_, 0), range(1,member_count+1)))
             ), range(1,member_count+1)))
         self.Objective = 0
-        self.Solved = False
 
     def initialize_candidates(self) -> None:
         """
@@ -34,8 +32,5 @@ class HeuristicMethod:
     def update_objective(self, pair: typing.Tuple[int, int]) -> None:
         self.Objective += self.Bids[pair[0]][pair[1]]
 
-    def _solve(self) -> bool:
+    def solve(self) -> None:
         raise NotImplementedError("Method solve not implemented")
-
-    def solve(self):
-        self.Solved = self._solve()

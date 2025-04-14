@@ -15,23 +15,12 @@ class GreedyHeuristic(HeuristicMethod):
         self.CoveredPairs.append(member_pair)
         self.CoveredPairs.append(member_pair[::-1])
 
-    def update_candidates(self, member_pair: typing.Tuple[int, int], delete_reverse: bool = False) -> None:
+    def update_candidates(self, member_pair: typing.Tuple[int, int]) -> None:
         self.Candidates.remove(member_pair)
-        if delete_reverse and member_pair[::-1] in self.Candidates:
-            self.Candidates.remove(member_pair[::-1])
-
-    def _singleton_member_pair(self) -> (bool, typing.Tuple[int, int]):
-        for pair in self.Candidates:
-            if pair[::-1] not in self.Candidates:
-                return True, pair
-        return False, None
+        self.Candidates.remove(member_pair[::-1])
 
     def sort_candidates_by_quality(self) -> typing.List[typing.Tuple[int, int]]:
-        singleton_pair_exists, singleton_pair = self._singleton_member_pair()
-        if singleton_pair_exists:
-            return [singleton_pair]
-        else:
-            return sorted(self.Candidates, key=lambda x: self.Bids[x[0]][x[1]], reverse=True)
+        return sorted(self.Candidates, key=lambda x: self.Bids[x[0]][x[1]], reverse=True)
 
     def _newly_constructed_cycle_members(self, member_pair: typing.Tuple[int, int]) -> typing.Iterable[typing.List[int]]:
         # print('member_pair:', member_pair)
@@ -44,7 +33,7 @@ class GreedyHeuristic(HeuristicMethod):
         uniq_cycles = list()
         for cycle_members in self._newly_constructed_cycle_members(member_pair):
             if cycle_members not in uniq_cycles:
-                # print(cycle_members)
+                # print('new cycle:', cycle_members)
                 uniq_cycles.append(cycle_members)
                 yield cycle_members
 
@@ -58,22 +47,24 @@ class GreedyHeuristic(HeuristicMethod):
                 return False
         return True
 
-    def _solve(self) -> bool:
+    def solve(self) -> None:
         while self.Candidates:
             sorted_candidates = self.sort_candidates_by_quality()
             candidate = sorted_candidates.pop(0)
+            # print('candidate:', candidate)
             feasible = self.validate_candidate(candidate)
+            self.update_candidates(candidate)
+            print('candidates number:', len(self.Candidates))
+            self.update_covered_pairs(candidate)
             if feasible:
-                self.update_candidates(candidate, delete_reverse=True)
-                print('candidates number:', len(self.Candidates))
-                self.update_covered_pairs(candidate)
                 self.Solution.append(candidate)
                 self.MemberPriorities[candidate[0]][candidate[1]] = 1
                 self.update_objective(candidate)
             else:
+                """
+                We can safely add j->i to Solution if i->j is not feasible.
+                """
                 print(candidate, 'is not feasible')
-                if candidate[::-1] in self.Candidates:
-                    self.update_candidates(candidate)
-                else:
-                    return False
-        return True
+                self.Solution.append(candidate[::-1])
+                self.MemberPriorities[candidate[1]][candidate[0]] = 1
+                self.update_objective(candidate[::-1])
