@@ -7,7 +7,7 @@ class GreedyHeuristic(HeuristicMethod):
 
     CoveredPairs: typing.List[typing.Tuple[int, int]]
 
-    def __init__(self, member_count: int, bids: typing.Dict[int, typing.Dict[int, int]]):
+    def __init__(self, member_count: int, bids: typing.Dict[int, typing.Dict[int, int]]) -> None:
         super().__init__(member_count, bids)
         self.CoveredPairs = []
 
