@@ -1,4 +1,5 @@
 import typing
+import json
 from src.project.helpers.data_parser import parse as data_parser
 from src.project.heuristics import HeuristicMethod
 from src.project.heuristics.grasp import Grasp
@@ -21,16 +22,17 @@ class Solver:
     SolverInstance: HeuristicMethod
     Algorithm: ALGORITHM
 
-    def __init__(self, data_file: str, algorithm: ALGORITHM) -> None:
+    def __init__(self, data_file: str, algorithm: ALGORITHM, solution_file: typing.Optional[str] = None) -> None:
         self.data_file = data_file
         self.MemberCount, self.Bids = data_parser(self.data_file)
         self.Algorithm = algorithm
+        self.solution_file = solution_file
 
     def __enter__(self) -> HeuristicMethod:
         if self.Algorithm == Algorithm.GREEDY:
             self.SolverInstance = GreedyHeuristic(self.MemberCount, self.Bids)
         elif self.Algorithm == Algorithm.LOCAL_SEARCH:
-            self.SolverInstance = LocalSearch(self.MemberCount, self.Bids)
+            self.SolverInstance = LocalSearch(self.MemberCount, self.Bids, solution_file=self.solution_file)
         elif self.Algorithm == Algorithm.GRASP:
             self.SolverInstance = Grasp(self.MemberCount, self.Bids)
         else:
@@ -43,3 +45,12 @@ class Solver:
             if self.Bids[s[0]][s[1]] > 0:
                 print(s[0], '->', s[1])
         print('Objective:', self.SolverInstance.Objective)
+        result = {
+            'Objective': self.SolverInstance.Objective,
+            'Solution': self.SolverInstance.Solution,
+            'MemberPriorities': self.SolverInstance.MemberPriorities,
+            'Bids': self.Bids
+        }
+        with open("../result/greedy/solution.json", "w") as file:
+            file.write(json.dumps(result, indent=4))
+
