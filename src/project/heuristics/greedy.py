@@ -5,12 +5,6 @@ from src.project.helpers.cycles_generator import generate_branches
 
 class GreedyHeuristic(HeuristicMethod):
 
-    CoveredPairs: typing.List[typing.Tuple[int, int]]
-
-    def __init__(self, member_count: int, bids: typing.Dict[int, typing.Dict[int, int]]) -> None:
-        super().__init__(member_count, bids)
-        self.CoveredPairs = []
-
     def update_covered_pairs(self, member_pair: typing.Tuple[int, int]) -> None:
         self.CoveredPairs.append(member_pair)
         self.CoveredPairs.append(member_pair[::-1])
@@ -23,8 +17,6 @@ class GreedyHeuristic(HeuristicMethod):
         return sorted(self.Candidates, key=lambda x: self.Bids[x[0]][x[1]], reverse=True)
 
     def _newly_constructed_cycles(self, member_pair: typing.Tuple[int, int]) -> typing.Iterable[typing.List[int]]:
-        # print('member_pair:', member_pair)
-        # print('covered pairs:', self.CoveredPairs)
         for branch in generate_branches([member_pair[1]], self.CoveredPairs):
             if member_pair[0] in branch:
                 yield branch[:branch.index(member_pair[0])+1]
@@ -51,7 +43,6 @@ class GreedyHeuristic(HeuristicMethod):
         while self.Candidates:
             sorted_candidates = self.sort_candidates_by_quality()
             candidate = sorted_candidates.pop(0)
-            # print('candidate:', candidate)
             feasible = self.validate_candidate(candidate)
             self.update_candidates(candidate)
             print('candidates number:', len(self.Candidates))
