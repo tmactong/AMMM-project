@@ -20,25 +20,7 @@ class Grasp(LocalSearch):
     def solve(self) -> None:
         """ Greedy Construction Phase"""
         print(f'{"="*20} Greedy Construction Phase {"="*20}')
-        while self.Candidates:
-            candidate = self.pop_random_candidate_from_rcl()
-            print(f"bid: {self.Bids[candidate[0]][candidate[1]]}")
-            feasible = self.validate_candidate(candidate)
-            self.update_candidates(candidate)
-            print('candidates number:', len(self.Candidates))
-            self.update_covered_pairs(candidate)
-            if feasible:
-                self.Solution.append(candidate)
-                self.MemberPriorities[candidate[0]][candidate[1]] = 1
-                self.update_objective(candidate)
-            else:
-                """
-                We can safely add j->i to Solution if i->j is not feasible.
-                """
-                print(candidate, 'is not feasible')
-                self.Solution.append(candidate[::-1])
-                self.MemberPriorities[candidate[1]][candidate[0]] = 1
-                self.update_objective(candidate[::-1])
+        self.greedy_solve(self.pop_random_candidate_from_rcl)
         """Local Search Phase"""
         print(f'{"="*20} Local Search Phase {"="*20}')
         super().solve()
