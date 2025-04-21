@@ -49,5 +49,5 @@ def validate_solution(solution_file: str) -> None:
 
 
 if __name__ == "__main__":
-    validate_solution(solution_file="../result/grasp/solution.json")
+    validate_solution(solution_file="../result/project.4/grasp/alpha=0.5/solution.grasp.try=1.objective=154.json")
     # print(generate_all_cycles(5))
