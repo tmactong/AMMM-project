@@ -65,4 +65,4 @@ class GreedyHeuristic(HeuristicMethod):
                 self.update_objective(candidate[::-1])
 
     def solve(self) -> None:
-        self.greedy_solve(self.sort_candidates_by_quality)
+        self.greedy_solve(self.pop_candidate_from_sorted)

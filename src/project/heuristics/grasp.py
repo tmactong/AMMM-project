@@ -1,13 +1,18 @@
+import time
 import random
 import typing
 from src.project.heuristics.local_search import LocalSearch
+from src.project.helpers.dump_solution import dump_solution
 
 class Grasp(LocalSearch):
 
     Alpha: float
+    MaxRetryTimes: int = 10
 
-    def __init__(self, member_count: int, bids: typing.Dict[int, typing.Dict[int, int]], alpha: float = 0) -> None:
-        super().__init__(member_count, bids)
+    def __init__(
+            self, member_count: int, bids: typing.Dict[int, typing.Dict[int, int]], project_name: str, alpha: float = 0
+    ) -> None:
+        super().__init__(member_count, bids, project_name)
         self.Alpha = alpha
 
     def pop_random_candidate_from_rcl(self) -> typing.Tuple[int, int]:
@@ -18,9 +23,24 @@ class Grasp(LocalSearch):
         return random.choice(rcl)
 
     def solve(self) -> None:
-        """ Greedy Construction Phase"""
-        print(f'{"="*20} Greedy Construction Phase {"="*20}')
-        self.greedy_solve(self.pop_random_candidate_from_rcl)
-        """Local Search Phase"""
-        print(f'{"="*20} Local Search Phase {"="*20}')
-        super().solve()
+        best_objective, best_solution, best_priorities = 0, [], dict()
+        for retry in range(1, self.MaxRetryTimes+1):
+            start_time = int(time.time())
+            self.initialize_variables()
+            """ Greedy Construction Phase"""
+            print(f'{"*"*20} Greedy Construction Phase {"*"*20}')
+            self.greedy_solve(self.pop_random_candidate_from_rcl)
+            print(f"Objective: {self.Objective}")
+            """ Local Search Phase """
+            print(f'{"*"*20} Local Search Phase {"*"*20}')
+            super().solve()
+            dump_solution(
+                'grasp', self.ProjectName, start_time, self.Objective, self.Solution,
+                self.MemberPriorities, self.Bids, alpha=self.Alpha, retry=retry)
+            if self.Objective > best_objective:
+                best_objective = self.Objective
+                best_solution = self.Solution
+                best_priorities = self.MemberPriorities
+        self.Solution = best_solution
+        self.Objective = best_objective
+        self.MemberPriorities = best_priorities

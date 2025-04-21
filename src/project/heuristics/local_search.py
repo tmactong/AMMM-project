@@ -82,6 +82,9 @@ class LocalSearch(GreedyHeuristic):
             print('no uncertain candidates')
             return certain_candidates, certain_candidates_decreasing_bid, []
         potential_flipped_candidates = inner_loop([], certain_candidates_decreasing_bid, uncertain_candidates)
+        if not potential_flipped_candidates:
+            print(f'no feasible uncertain flipped candidates')
+            return [], -1, []
         to_check_candidates = list()
         for candidates, decreasing_bid in potential_flipped_candidates:
             drop = False

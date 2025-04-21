@@ -13,19 +13,13 @@ class HeuristicMethod:
     Objective: int
     CoveredPairs: typing.List[typing.Tuple[int, int]]
 
-    def __init__(self, member_count: int, bids: typing.Dict[int, typing.Dict[int, int]],
+    def __init__(self, member_count: int, bids: typing.Dict[int, typing.Dict[int, int]], project_name: str,
                  solution_file: typing.Optional[str] = None) -> None:
         self.MemberCount = member_count
         self.Bids = bids
-        self.initialize_candidates()
-        self.Solution = list()
-        self.MemberPriorities = dict(
-            map(lambda _: (
-                _, dict(map(lambda _: (_, 0), range(1,member_count+1)))
-            ), range(1,member_count+1)))
-        self.Objective = 0
+        self.ProjectName = project_name
+        self.initialize_variables()
         self.solution_file = solution_file
-        self.CoveredPairs = []
         if self.solution_file:
             print('import solution from file:', self.solution_file)
             self.load_solution_file()
@@ -44,6 +38,16 @@ class HeuristicMethod:
                 for j in range(1, self.MemberCount+1):
                     if i != j:
                         self.CoveredPairs.append((i, j))
+
+    def initialize_variables(self) -> None:
+        self.Solution = list()
+        self.MemberPriorities = dict(
+            map(lambda _: (
+                _, dict(map(lambda _: (_, 0), range(1, self.MemberCount + 1)))
+            ), range(1, self.MemberCount + 1)))
+        self.Objective = 0
+        self.CoveredPairs = []
+        self.initialize_candidates()
 
     def initialize_candidates(self) -> None:
         """
