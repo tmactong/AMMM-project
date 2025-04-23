@@ -1,5 +1,6 @@
 import typing
 from src.project.heuristics.greedy import GreedyHeuristic
+from src.project.helpers.cycles_generator import generate_all_permutations
 
 
 class LocalSearch(GreedyHeuristic):
@@ -15,15 +16,14 @@ class LocalSearch(GreedyHeuristic):
             if self.Bids[pair[1]][pair[0]] > self.Bids[pair[0]][pair[1]]:
                 yield pair[::-1]
 
-    def cycles_with_specified_pair(self, pair: typing.Tuple[int, int]) -> typing.List[typing.List[int]]:
-        """
-        pair (i, j)
-        Priority[i][j] = 0 & Bids[i][j] > Bids[j][i]
-        """
+    """
+        def cycles_with_specified_pair(self, pair: typing.Tuple[int, int]) -> typing.List[typing.List[int]]:
         cycles = self._uniq_newly_constructed_cycles(pair)
         return [cycle for cycle in cycles if cycle != list(pair[::-1])]
+    """
 
-    def get_formed_loops(self, cycles: typing.List[typing.List[int]]) -> typing.Iterable[typing.List[int]]:
+
+    def get_formed_loops(self, cycles: typing.Iterable[typing.List[int]]) -> typing.Iterable[typing.List[int]]:
         for cycle in cycles:
             cycle_priority = 0
             for i in range(len(cycle) - 1):
@@ -102,8 +102,7 @@ class LocalSearch(GreedyHeuristic):
         return certain_candidates, certain_candidates_decreasing_bid, to_check_candidates
 
     def can_be_flipped(self, pair: typing.Tuple[int, int]) -> bool:
-        # TODO: flip more pairs if needed
-        cycles = self._uniq_newly_constructed_cycles(pair)
+        cycles = generate_all_permutations(self.MemberCount, pair)
         for cycle in cycles:
             priorities = 0
             for i in range(len(cycle) - 1):
@@ -122,7 +121,8 @@ class LocalSearch(GreedyHeuristic):
             pair_can_be_flipped = True
             skip_this_pair = False
             potential_increasing_bid = self.Bids[pair[0]][pair[1]] - self.Bids[pair[1]][pair[0]]
-            cycles = self.cycles_with_specified_pair(pair)
+            # cycles = self.cycles_with_specified_pair(pair)
+            cycles = generate_all_permutations(self.MemberCount, pair)
             formed_loops = list(self.get_formed_loops(cycles))
             if not formed_loops:
                 print('no loops formed')

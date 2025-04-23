@@ -30,7 +30,6 @@ class GreedyHeuristic(HeuristicMethod):
         uniq_cycles = list()
         for cycle in self._newly_constructed_cycles(member_pair):
             if cycle not in uniq_cycles:
-                # print('new cycle:', cycle)
                 uniq_cycles.append(cycle)
         return uniq_cycles
 

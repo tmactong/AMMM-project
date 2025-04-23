@@ -33,8 +33,17 @@ def generate_cycle_patterns(digits: typing.List[int]) -> typing.Iterable[typing.
                 yield prefix + list(permutation)
 
 
+def generate_all_permutations(total_count:int, pair:typing.Tuple[int, int]) -> typing.Iterable[typing.List[int]]:
+    members = list(itertools.filterfalse(lambda x: x in pair, range(1, total_count + 1)))
+    for i in range(1, len(members) + 1):
+        for j in itertools.permutations(members, i):
+            yield [pair[1]] + list(j) + [pair[0]]
+
+
 if __name__ == '__main__':
     n = 4
     # generated_sequences = list(generate_cycle_patterns(list(range(1, 1 + n))))
     # print("generated sequences:", len(generated_sequences), generated_sequences)
-    print(get_combinations(5, 3))
+    # print(get_combinations(5, 3))
+    pairs = generate_all_permutations(10, (1,3))
+    print(len(list(pairs)))

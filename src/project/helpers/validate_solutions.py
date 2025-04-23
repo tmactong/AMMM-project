@@ -31,6 +31,7 @@ def validate_solution(solution_file: str) -> None:
         all_cycles = generate_all_cycles(member_count)
         print(f"{sum([len(x) for x in all_cycles.values()])} cycles generated")
         for length, cycles in all_cycles.items():
+            infeasible_cycles = 0
             for cycle in cycles:
                 priority_sum = 0
                 for i in range(len(cycle)-1):
@@ -41,7 +42,11 @@ def validate_solution(solution_file: str) -> None:
                 except AssertionError:
                     print(cycle, priority_sum)
                     feasible = False
-            print(f"member count {length}: all {len(cycles)} cycles passed")
+                    infeasible_cycles += 1
+            if not infeasible_cycles:
+                print(f"member count {length}: all {len(cycles)} cycles PASSED")
+            else:
+                print(f"member count {length}: {infeasible_cycles} of {len(cycles)} cycles NOT PASSED")
     if feasible:
         print("Feasible Solution")
     else:
@@ -49,5 +54,5 @@ def validate_solution(solution_file: str) -> None:
 
 
 if __name__ == "__main__":
-    validate_solution(solution_file="../result/project.4/grasp/alpha=0.5/solution.grasp.try=1.objective=154.json")
+    validate_solution(solution_file="../result/project.4/grasp/alpha=0.5/solution.grasp.try=4.objective=159.json")
     # print(generate_all_cycles(5))
