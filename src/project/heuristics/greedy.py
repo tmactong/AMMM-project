@@ -3,6 +3,8 @@ from collections.abc import Callable
 from src.project.heuristics import HeuristicMethod
 from src.project.helpers.cycles_generator import generate_branches, generate_all_permutations
 
+CHOOSING_METHODS_MAGIC_NUMBER = 68
+
 
 class GreedyHeuristic(HeuristicMethod):
 
@@ -48,7 +50,15 @@ class GreedyHeuristic(HeuristicMethod):
                 yield cycle
 
     def validate_candidate(self, candidate: typing.Tuple[int, int]) -> bool:
-        new_cycles = self.uniq_newly_constructed_cycles(candidate)
+        """
+        By testing I found that when the length of self.CoveredPairs is less than 68, using self.CoveredPairs to
+        generate cycles is more efficient, and when the length of self.CoveredPairs is greater than 68, using
+        self.UncoveredPairs to generate cycles is more efficient.
+        """
+        if len(self.CoveredPairs) < CHOOSING_METHODS_MAGIC_NUMBER:
+            new_cycles = self._uniq_newly_constructed_cycles(candidate)
+        else:
+            new_cycles = self.uniq_newly_constructed_cycles(candidate)
         for cycle in new_cycles:
             cycle_priority = 0
             for idx in range(len(cycle) - 1):

@@ -1,3 +1,4 @@
 
 - [x] Local search Optimization
-- [ ] Greedy Optimization
+- [x] Greedy Optimization
+- [ ] instance generator script
