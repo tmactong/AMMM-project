@@ -55,7 +55,7 @@ def validate_solution(solution_file: str) -> None:
 
 
 if __name__ == "__main__":
-    path = "../result/project.5/grasp/alpha=0.1"
+    path = "../result/project.7/grasp/alpha=0.1"
     for file in os.listdir(path):
         if file.startswith('solution'):
             print(f'validate solution file {file}')
