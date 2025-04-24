@@ -1,7 +1,7 @@
 import typing
 from collections.abc import Callable
 from src.project.heuristics import HeuristicMethod
-from src.project.helpers.cycles_generator import generate_branches
+from src.project.helpers.cycles_generator import generate_branches, generate_all_permutations
 
 
 class GreedyHeuristic(HeuristicMethod):
@@ -9,6 +9,8 @@ class GreedyHeuristic(HeuristicMethod):
     def update_covered_pairs(self, member_pair: typing.Tuple[int, int]) -> None:
         self.CoveredPairs.append(member_pair)
         self.CoveredPairs.append(member_pair[::-1])
+        self.NotCoveredPairs.remove(member_pair)
+        self.NotCoveredPairs.remove(member_pair[::-1])
 
     def update_candidates(self, member_pair: typing.Tuple[int, int]) -> None:
         self.Candidates.remove(member_pair)
@@ -33,8 +35,20 @@ class GreedyHeuristic(HeuristicMethod):
                 uniq_cycles.append(cycle)
         return uniq_cycles
 
+    def uniq_newly_constructed_cycles(self, member_pair: typing.Tuple[int, int]) -> typing.Iterable[typing.List[int]]:
+        all_cycles = generate_all_permutations(self.MemberCount, member_pair)
+        not_covered_pairs = [list(x) for x in self.NotCoveredPairs]
+        for cycle in all_cycles:
+            found = True
+            for not_covered_pair in not_covered_pairs:
+                if any(not_covered_pair == cycle[i:i + 2] for i in range(len(cycle) - 1)):
+                    found = False
+                    break
+            if found:
+                yield cycle
+
     def validate_candidate(self, candidate: typing.Tuple[int, int]) -> bool:
-        new_cycles = self._uniq_newly_constructed_cycles(candidate)
+        new_cycles = self.uniq_newly_constructed_cycles(candidate)
         for cycle in new_cycles:
             cycle_priority = 0
             for idx in range(len(cycle) - 1):

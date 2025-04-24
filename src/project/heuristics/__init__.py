@@ -12,6 +12,7 @@ class HeuristicMethod:
     MemberPriorities: typing.Dict[typing.Any, typing.Dict[typing.Any, int]]
     Objective: int
     CoveredPairs: typing.List[typing.Tuple[int, int]]
+    NotCoveredPairs: typing.List[typing.Tuple[int, int]]
 
     def __init__(self, member_count: int, bids: typing.Dict[int, typing.Dict[int, int]], project_name: str,
                  solution_file: typing.Optional[str] = None) -> None:
@@ -34,10 +35,7 @@ class HeuristicMethod:
                 for j in member_priorities[i]:
                     self.MemberPriorities[int(i)][int(j)] = member_priorities[i][j]
             self.Objective = greedy_result['Objective']
-            for i in range(1, self.MemberCount+1):
-                for j in range(1, self.MemberCount+1):
-                    if i != j:
-                        self.CoveredPairs.append((i, j))
+            self.CoveredPairs = list(itertools.permutations(range(1, self.MemberCount + 1), 2))
 
     def initialize_variables(self) -> None:
         self.Solution = list()
@@ -47,13 +45,7 @@ class HeuristicMethod:
             ), range(1, self.MemberCount + 1)))
         self.Objective = 0
         self.CoveredPairs = []
-        self.initialize_candidates()
-
-    def initialize_candidates(self) -> None:
-        """
-        Example:
-            [1,2,3] -> [(1, 2), (1, 3), (2, 1), (2, 3), (3, 1), (3, 2)]
-        """
+        self.NotCoveredPairs = list(itertools.permutations(range(1, self.MemberCount + 1), 2))
         self.Candidates = list(itertools.permutations(range(1, self.MemberCount + 1), 2))
 
     def update_objective(self, pair: typing.Tuple[int, int]) -> None:

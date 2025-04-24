@@ -25,6 +25,7 @@ class Grasp(LocalSearch):
     def solve(self) -> None:
         best_objective, best_solution, best_priorities = 0, [], dict()
         for retry in range(1, self.MaxRetryTimes+1):
+            print(f"Retry: {retry}")
             start_time = int(time.time())
             self.initialize_variables()
             """ Greedy Construction Phase"""
@@ -42,6 +43,7 @@ class Grasp(LocalSearch):
                 best_objective = self.Objective
                 best_solution = self.Solution
                 best_priorities = self.MemberPriorities
+            print(f'Retry {retry} finished')
         self.Solution = best_solution
         self.Objective = best_objective
         self.MemberPriorities = best_priorities
