@@ -1,5 +1,4 @@
 import typing
-import json
 import time
 import os
 from src.project.helpers.data_parser import parse as data_parser

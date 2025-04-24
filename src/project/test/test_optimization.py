@@ -19,39 +19,6 @@ for pair in _covered_pairs:
 NotCoveredPairs = list(set(MEMBER_PERMUTATIONS) - set(CoveredPairs))
 NotCoveredPairs.append((1,3))
 NotCoveredPairs.append((3,1))
-print(NotCoveredPairs)
-
-
-
-"""
-for i in range(1, MemberCount + 1):
-    for j in range(1, MemberCount + 1):
-        if i != j:
-            CoveredPairs.append((i, j))
-
-for pair in [(2,3), (5,6),(7,8), (5,9), (9,3), (10,2)]:
-#for pair in [(2, 3)]:
-    CoveredPairs.remove(pair)
-    CoveredPairs.remove(pair[::-1])
-    NotCoveredPairs.append(pair)
-    NotCoveredPairs.append(pair[::-1])
-"""
-
-
-"""
-for i in range(1, MemberCount + 1):
-    for j in range(1, MemberCount + 1):
-        if i != j:
-            NotCoveredPairs.append((i, j))
-
-for pair in [(2,3), (5,6),(7,8), (5,9), (9,3), (10,2)]:
-#for pair in [(2, 3)]:
-    NotCoveredPairs.remove(pair)
-    NotCoveredPairs.remove(pair[::-1])
-    CoveredPairs.append(pair)
-    CoveredPairs.append(pair[::-1])
-"""
-
 
 
 def newly_constructed_cycles(member_pair: typing.Tuple[int, int]) -> typing.Iterable[typing.List[int]]:

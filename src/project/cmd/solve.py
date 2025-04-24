@@ -16,12 +16,13 @@ if __name__ == '__main__':
     # main('../testdata/project.2.dat', 'local_search')
     # main('../testdata/project.2.dat', 'grasp', alpha=0.9)
     # project 3: 10 members
-    # main('../testdata/project.3.dat', 'greedy')
+    for alpha in (0.1, 0.3, 0.5, 0.7, 0.9):
+        main('../testdata/project.5.dat', 'grasp', alpha=alpha)
     # project 4: 10 members
     # main('../testdata/project.4.dat', 'greedy')
-    # main('../testdata/project.4.dat', 'local_search', '../result/greedy/project.4.json')
+    # main('../testdata/project.4.dat', 'local_search')
     # main('../testdata/project.4.dat', 'local_search', '../result/project.4/grasp/alpha=0.5/solution.grasp.try=1.objective=154.json')
-    main('../testdata/project.4.dat', 'grasp', alpha=0.9)
+    # main('../testdata/project.4.dat', 'grasp', alpha=0.9)
     # main('../testdata/project.4.dat', 'local_search', '../result/greedy/project.4.ls_1st.json')
     # test infeasible solution
     # main('../testdata/infeasible_solution.dat', 'greedy')

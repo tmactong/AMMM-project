@@ -35,7 +35,6 @@ class HeuristicMethod:
                 for j in member_priorities[i]:
                     self.MemberPriorities[int(i)][int(j)] = member_priorities[i][j]
             self.Objective = greedy_result['Objective']
-            self.CoveredPairs = list(itertools.permutations(range(1, self.MemberCount + 1), 2))
 
     def initialize_variables(self) -> None:
         self.Solution = list()
