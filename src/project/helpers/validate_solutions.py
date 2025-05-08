@@ -55,12 +55,12 @@ def validate_solution(solution_file: str) -> None:
 
 
 if __name__ == "__main__":
-    path = "../result/project.7/grasp/alpha=0.1"
-    for file in os.listdir(path):
-        if file.startswith('solution'):
-            print(f'validate solution file {file}')
-            validate_solution(os.path.join(path, file))
-            print(f'{"#"*30}')
+    #path = "../result/project.7/grasp/alpha=0.1"
+    #for file in os.listdir(path):
+    #    if file.startswith('solution'):
+    #        print(f'validate solution file {file}')
+    #        validate_solution(os.path.join(path, file))
+    #        print(f'{"#"*30}')
     # validate_solution(solution_file="../result/project.4/grasp/alpha=0.5/solution.grasp.try=4.objective=159.json")
-    # validate_solution("../result/project.4/solution.greedy.objective=152.json")
+    validate_solution("generated_solution.json")
     # print(generate_all_cycles(5))
