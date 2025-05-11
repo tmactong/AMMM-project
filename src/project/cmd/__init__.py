@@ -50,8 +50,7 @@ class Solver:
     def __exit__(self, *args) -> None:
         print('Solution:')
         for s in sorted(self.SolverInstance.Solution):
-            if self.Bids[s[0]][s[1]] > 0:
-                print(s[0], '->', s[1])
+            print(s[0], '->', s[1])
         print('Objective:', self.SolverInstance.Objective)
         dump_solution(
             self.Algorithm, self.ProjectName, self.start_time,

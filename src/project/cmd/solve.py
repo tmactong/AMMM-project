@@ -15,12 +15,12 @@ if __name__ == '__main__':
     # main('../testdata/project.2.dat', 'local_search')
     # main('../testdata/project.2.dat', 'grasp', alpha=0.9)
     # project 3: 10 members
-    for alpha in (0.1, 0.3, 0.5, 0.7, 0.9):
-        main('../testdata/project.45members.dat', 'grasp', alpha=alpha)
+    #for alpha in (0.1, 0.3, 0.5, 0.7, 0.9):
+    #    main('../testdata/project.45members.dat', 'grasp', alpha=alpha)
     # project 4: 10 members
     # main('../testdata/project.4.dat', 'greedy')
     # main('../testdata/project.4.dat', 'local_search')
     # main('../testdata/project.4.dat', 'local_search', '../result/project.4/grasp/alpha=0.5/solution.grasp.try=1.objective=154.json')
     # main('../testdata/project.4.dat', 'grasp', alpha=0.9)
     # test infeasible solution
-    # main('../testdata/infeasible_solution.dat', 'greedy')
+    main('../testdata/infeasible_solution.dat', 'greedy')
