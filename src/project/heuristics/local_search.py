@@ -26,15 +26,15 @@ class LocalSearch(GreedyHeuristic):
             candidates_bid_decrease[(i,j)] = self.Bids[j][i] - self.Bids[i][j]
         #print(candidates_bid_decrease)
         bid_decrease = 0
-        #print('edges:', edges)
+        indegree, outdegree, edges = trim_graph(edges)
         while edges:
-            indegree, outdegree, edges = trim_graph(edges)
-            #print('edges:', edges)
-            if not edges:
-                break
-            candidates = [(i, j) for i, j in edges if 0 <= self.Bids[i][j] - self.Bids[j][i] < increasing_bid and
-                          (i,j) not in chosen_candidates and (j,i) not in chosen_candidates]
-            #print('candidates:', candidates)
+            #indegree, outdegree, edges = trim_graph(edges)
+            #if not edges:
+            #    break
+            # edges: [(4, 7), (8, 3), (8, 4), (7, 3), (3, 9), (4, 10), (10, 3), (7, 9), (9, 6), (6, 8), (7, 6), (10, 7), (8, 7)]
+            # edges: [(4, 7), (8, 3), (8, 4), (3, 7), (3, 9), (4, 10), (10, 3), (7, 9), (9, 6), (6, 8), (7, 6), (10, 7), (8, 7)]
+            # flip (7,3) to (3,7) , no cycles were eliminated!!!.
+            candidates = [(i, j) for i, j in edges if 0 <= self.Bids[i][j] - self.Bids[j][i] < increasing_bid ]
             if not candidates:
                 print(f'no feasible flipped candidates')
                 return [], -1
@@ -46,15 +46,29 @@ class LocalSearch(GreedyHeuristic):
             for i,j in candidates:
                 candidates_degree[(i,j)] = member_degree[i] + member_degree[j]
             candidates.sort(key=lambda pair: (candidates_degree[pair], candidates_bid_decrease[pair]), reverse=True)
-            chosen_candidate = candidates.pop(0)
-            #print(f'chosen candidate: {chosen_candidate}, decrease: {self.Bids[chosen_candidate[0]][chosen_candidate[1]]-self.Bids[chosen_candidate[1]][chosen_candidate[0]]}')
+            # find candidate
+            chosen_candidate = None
+            for candidate in candidates:
+                new_edges = [x for x in edges]
+                new_edges[new_edges.index(candidate)] = candidate[::-1]
+                new_indegree, new_outdegree, new_edges = trim_graph(new_edges)
+                if len(new_edges) < len(edges):
+                    chosen_candidate = candidate
+                    indegree = new_indegree
+                    outdegree = new_outdegree
+                    edges = new_edges
+                    # print(f'chosen candidate: {chosen_candidate}')
+                    break
+            if not chosen_candidate:
+                print(f'no feasible flipped useful candidates')
+                return [], -1
             bid_decrease += self.Bids[chosen_candidate[0]][chosen_candidate[1]] - \
                             self.Bids[chosen_candidate[1]][chosen_candidate[0]]
             if bid_decrease >= increasing_bid:
-                print(f'decreased bid is greater than increasing_bid: {bid_decrease} > {increasing_bid}')
+                print(f'decreased bid is greater than increasing_bid: {bid_decrease} >= {increasing_bid}')
                 return [], -1
             chosen_candidates.append(chosen_candidate)
-            edges[edges.index(chosen_candidate)] = chosen_candidate[::-1]
+            #edges[edges.index(chosen_candidate)] = chosen_candidate[::-1]
         return chosen_candidates, bid_decrease
 
     def can_be_flipped(self, pair: typing.Tuple[int, int],knockon_pairs: typing.List[typing.Tuple[int, int]]) -> bool:
