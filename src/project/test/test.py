@@ -79,7 +79,7 @@ def topologicalSort(V, edges):
 
 def test_trim(edges):
     print('edges', edges)
-    edges = trim_graph(edges)
+    edges, _, _ = trim_graph(edges)
     print('edges', edges)
 
 

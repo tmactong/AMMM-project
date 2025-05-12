@@ -6,7 +6,7 @@ def get_vertices_from_edges(edges: t.List[t.Tuple[int, int]]) -> t.Set[int]:
         vertices |= set(edge)
     return vertices
 
-def trim_graph(edges: t.List[t.Tuple[int, int]]) -> t.List[t.Tuple[int, int]]:
+def trim_graph(edges: t.List[t.Tuple[int, int]]) -> (t.List[t.Tuple[int, int]], t.Dict[int, int], t.Dict[int, int]):
     vertices = get_vertices_from_edges(edges)
     neighbors = construct_neighbors(vertices, edges)
     indegree = dict(map(lambda _: (_, 0), vertices))
@@ -21,7 +21,7 @@ def trim_graph(edges: t.List[t.Tuple[int, int]]) -> t.List[t.Tuple[int, int]]:
         trim_vertices_with_zero_indegree(edges, neighbors, indegree, outdegree)
         if edges:
             trim_vertices_with_zero_outdegree(edges, neighbors, indegree, outdegree)
-    return edges
+    return edges, indegree, outdegree
 
 def trim_vertices_with_zero_indegree(
         edges: t.List[t.Tuple[int, int]], neighbors: t.Dict[int, t.List[int]],

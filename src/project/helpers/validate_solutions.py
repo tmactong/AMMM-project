@@ -9,7 +9,7 @@ def validate_solution(solution_file: str) -> None:
         Solution = [(x[0], x[1]) for x in solution["Solution"]]
         member_count = int(sorted(map(int, solution['MemberPriorities'].keys()))[-1])
         #_, residual = topological_sort(Solution)
-        residual = trim_graph(Solution)
+        residual, _, _ = trim_graph(Solution)
         if residual:
             print('INFEASIBLE')
         else:
@@ -27,6 +27,6 @@ if __name__ == "__main__":
             print(f'{"#"*30}')
     '''
 
-    validate_solution(solution_file="../result/project.45members/solution.local_search.objective=4729.json")
+    validate_solution(solution_file="../result/project.45members/solution.local_search.objective=4794.json")
     # validate_solution("generated_solution.json")
     # print(generate_all_cycles(5))

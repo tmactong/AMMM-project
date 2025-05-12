@@ -19,7 +19,7 @@ class GreedyHeuristic(HeuristicMethod):
 
     def validate_candidate(self, candidate: typing.Tuple[int, int]) -> bool:
         #_, residual_edges = topological_sort(self.Solution + [candidate])
-        residual_edges = trim_graph(self.Solution + [candidate])
+        residual_edges,_,_ = trim_graph(self.Solution + [candidate])
         return len(residual_edges) == 0
 
     def greedy_solve(self, pop_candidate_func: Callable[[], typing.Tuple[int, int]]) -> None:

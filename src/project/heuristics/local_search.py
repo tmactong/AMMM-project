@@ -1,7 +1,7 @@
 import typing
 import copy
 from src.project.heuristics.greedy import GreedyHeuristic
-from src.project.helpers.graph import trim_graph
+from src.project.helpers.graph import trim_graph, get_vertices_from_edges
 
 
 class LocalSearch(GreedyHeuristic):
@@ -21,25 +21,31 @@ class LocalSearch(GreedyHeuristic):
             self, increasing_bid: int, edges: typing.List[typing.Tuple[int, int]]
     ) -> (typing.List[typing.Tuple[int, int]], int):
         chosen_knockon_pairs = []
-        candidates_bid_decrease = dict(map(lambda _: (_, self.Bids[_[0]][_[1]] - self.Bids[_[1]][_[0]]), edges))
+        candidates_bid_decrease = dict(map(lambda _: (_, self.Bids[_[1]][_[0]] - self.Bids[_[0]][_[1]]), edges))
         total_bid_decrease = 0
-        edges = trim_graph(edges)
+        edges, indegree, outdegree = trim_graph(edges)
         while edges:
             # edges: [(4, 7), (8, 3), (8, 4), (7, 3), (3, 9), (4, 10), (10, 3), (7, 9), (9, 6), (6, 8), (7, 6), (10, 7), (8, 7)]
             # edges: [(4, 7), (8, 3), (8, 4), (3, 7), (3, 9), (4, 10), (10, 3), (7, 9), (9, 6), (6, 8), (7, 6), (10, 7), (8, 7)]
             # flip (7,3) to (3,7) , no cycles were eliminated!!!.
-            candidate_pairs = [(i, j) for i, j in edges if self.Bids[i][j] - self.Bids[j][i] >= 0 and
-                          self.Bids[i][j] - self.Bids[j][i] + total_bid_decrease < increasing_bid ]
+            candidate_pairs = [(i, j) for i, j in edges if self.Bids[i][j] - self.Bids[j][i] + total_bid_decrease < increasing_bid ]
             if not candidate_pairs:
                 print(f'no feasible flipped candidates')
                 return [], -1
-            candidate_pairs.sort(key=lambda pair: candidates_bid_decrease[pair])
+            vertices = get_vertices_from_edges(edges)
+            vertex_degrees = dict(map(lambda v: (v, indegree[v] + outdegree[v]), vertices))
+            candidate_pairs.sort(
+                key=lambda pair: (
+                    vertex_degrees[pair[0]] + vertex_degrees[pair[1]],candidates_bid_decrease[pair]
+                ),
+                reverse=True
+            )
             # find candidate
             found = False
             for i,j in candidate_pairs:
                 new_edges = [x for x in edges]
                 new_edges[new_edges.index((i,j))] = (j,i)
-                new_edges = trim_graph(new_edges)
+                new_edges, indegree, outdegree = trim_graph(new_edges)
                 if len(new_edges) < len(edges):
                     total_bid_decrease += self.Bids[i][j] - self.Bids[j][i]
                     edges = new_edges
@@ -57,8 +63,7 @@ class LocalSearch(GreedyHeuristic):
         solution[solution.index(pair[::-1])] = pair
         for knockon_pair in knockon_pairs:
             solution[solution.index(knockon_pair)] = knockon_pair[::-1]
-        #_, residual_edges = topological_sort(solution)
-        residual_edges = trim_graph(solution)
+        residual_edges, _, _ = trim_graph(solution)
         if residual_edges:
             return False
         return True
@@ -72,8 +77,7 @@ class LocalSearch(GreedyHeuristic):
             potential_increasing_bid = self.Bids[pair[0]][pair[1]] - self.Bids[pair[1]][pair[0]]
             solution = copy.deepcopy(self.Solution)
             solution[solution.index(pair[::-1])] = pair
-            #_, residual_edges = topological_sort(solution)
-            residual_edges = trim_graph(solution)
+            residual_edges, _, _ = trim_graph(solution)
             if not residual_edges:
                 print('no loops formed')
                 return True, potential_increasing_bid, pair, []
