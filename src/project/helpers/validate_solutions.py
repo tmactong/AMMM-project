@@ -1,5 +1,5 @@
 import json
-from src.project.helpers.graph import topological_sort
+from src.project.helpers.graph import trim_graph
 
 
 def validate_solution(solution_file: str) -> None:
@@ -8,7 +8,8 @@ def validate_solution(solution_file: str) -> None:
         solution = json.load(file)
         Solution = [(x[0], x[1]) for x in solution["Solution"]]
         member_count = int(sorted(map(int, solution['MemberPriorities'].keys()))[-1])
-        _, residual = topological_sort(Solution)
+        #_, residual = topological_sort(Solution)
+        residual = trim_graph(Solution)
         if residual:
             print('INFEASIBLE')
         else:

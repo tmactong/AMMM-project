@@ -7,9 +7,9 @@ def main(data_file: str, algorithm: ALGORITHM, alpha: float = 0) -> None:
 
 
 if __name__ == '__main__':
-    # main('../testdata/project.9.dat', 'local_search')
+    main('../testdata/project.1.dat', 'local_search')
     # project 6: 8 members
-    main('../testdata/project.45members.dat', 'local_search')
+    #main('../testdata/project.45members.dat', 'local_search')
     # project 2: 6 members
     # main('../testdata/project.8.dat', 'greedy')
     # main('../testdata/project.2.dat', 'local_search')

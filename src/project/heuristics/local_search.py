@@ -1,7 +1,7 @@
 import typing
 import copy
 from src.project.heuristics.greedy import GreedyHeuristic
-from src.project.helpers.graph import topological_sort, trim_graph
+from src.project.helpers.graph import trim_graph
 
 
 class LocalSearch(GreedyHeuristic):
@@ -57,7 +57,8 @@ class LocalSearch(GreedyHeuristic):
         solution[solution.index(pair[::-1])] = pair
         for knockon_pair in knockon_pairs:
             solution[solution.index(knockon_pair)] = knockon_pair[::-1]
-        _, residual_edges = topological_sort(solution)
+        #_, residual_edges = topological_sort(solution)
+        residual_edges = trim_graph(solution)
         if residual_edges:
             return False
         return True
@@ -71,11 +72,11 @@ class LocalSearch(GreedyHeuristic):
             potential_increasing_bid = self.Bids[pair[0]][pair[1]] - self.Bids[pair[1]][pair[0]]
             solution = copy.deepcopy(self.Solution)
             solution[solution.index(pair[::-1])] = pair
-            _, residual_edges = topological_sort(solution)
+            #_, residual_edges = topological_sort(solution)
+            residual_edges = trim_graph(solution)
             if not residual_edges:
                 print('no loops formed')
                 return True, potential_increasing_bid, pair, []
-
             candidates, decreasing_bid = self.get_knockon_pairs(potential_increasing_bid, residual_edges)
             if decreasing_bid == -1:
                 continue

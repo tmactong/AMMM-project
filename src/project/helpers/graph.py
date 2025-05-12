@@ -57,30 +57,3 @@ def construct_neighbors(vertices: t.Set[int], edges:t.List[t.Tuple[int, int]]) -
     for i, j in edges:
         neighbors[i].append(j)
     return neighbors
-
-def topological_sort(edges: t.List[t.Tuple[int, int]]) -> (t.List[int], t.List[int]):
-    vertices = get_vertices_from_edges(edges)
-    indegree = dict(map(lambda _: (_, 0), vertices))
-    topological_sorted_order = []
-    neighbors = construct_neighbors(vertices, edges)
-    for vertex in vertices:
-        for neighbor in neighbors[vertex]:
-            indegree[neighbor] += 1
-    nodes_with_zero_indegree = [vertex for vertex in vertices if indegree[vertex] == 0]
-    while nodes_with_zero_indegree:
-        node = nodes_with_zero_indegree.pop()
-        topological_sorted_order.append(node)
-        for neighbor in neighbors[node]:
-            indegree[neighbor] -= 1
-            edges.remove((node, neighbor))
-            if indegree[neighbor] == 0:
-                nodes_with_zero_indegree.append(neighbor)
-    # Check for cycle
-    if len(topological_sorted_order) != len(vertices):
-        return [], edges
-    return topological_sorted_order, []
-
-
-if __name__ == "__main__":
-    edges = [(1, 3), (2, 1), (3, 2)]
-    topological_sorted_order, residual_edges = topological_sort(edges)
