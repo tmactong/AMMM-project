@@ -1,6 +1,6 @@
 import time
 from collections import deque
-from src.project.helpers.graph import trim_outdegree, trim_indegree, trim_graph
+from src.project.helpers.graph import trim_vertices_with_zero_outdegree, trim_vertices_with_zero_indegree, trim_graph
 
 
 # We mainly take input graph as a set of edges. This function is
@@ -78,21 +78,19 @@ def topologicalSort(V, edges):
 
 
 def test_trim(edges):
-    indegree, outdegree, edges = trim_graph(edges)
-    print('indegree', indegree)
-    print('outdegree', outdegree)
+    print('edges', edges)
+    edges = trim_graph(edges)
     print('edges', edges)
 
 
 
 if __name__ == "__main__":
-    V = 6
     # edges = [[0, 1], [1, 2], [2, 3], [4, 5], [5, 1], [5, 2]]
     # edges = [[0, 1], [1, 2], [2, 3], [4, 5], [5, 1], [2, 5]]
-    #edges = [(0, 4), (4, 5), (5, 1), (1, 0), (2, 5), (1, 2),(2,3)]
+    edges = [(0, 4), (4, 5), (5, 1), (1, 0), (2, 5), (1, 2),(2,3)]
     #edges = [(0, 2), (1, 0), (2, 1)]
     #edges = [(4, 2), (4, 7), (8, 3), (8, 4), (9, 2), (3, 7), (3, 9), (4, 10), (10, 3), (7, 9), (9, 6), (6, 8), (7, 6), (3, 2), (10, 7), (9, 5), (8, 1), (8, 7), (6, 1)]
-    edges =  [(4, 7), (8, 3), (8, 4), (7, 3), (3, 9), (4, 10), (10, 3), (7, 9), (9, 6), (6, 8), (7, 6), (10, 7), (8, 7)]
+    #edges =  [(4, 7), (8, 3), (8, 4), (7, 3), (3, 9), (4, 10), (10, 3), (7, 9), (9, 6), (6, 8), (7, 6), (10, 7), (8, 7)]
     #result = topologicalSort(V, edges)
     #if result:
     #    print("Topological Order:", result)

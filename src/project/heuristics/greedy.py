@@ -18,29 +18,27 @@ class GreedyHeuristic(HeuristicMethod):
 
     def validate_candidate(self, candidate: typing.Tuple[int, int]) -> bool:
         _, residual_edges = topological_sort(self.Solution + [candidate])
-        if residual_edges:
-            return False
-        return True
+        return len(residual_edges) == 0
 
     def greedy_solve(self, pop_candidate_func: Callable[[], typing.Tuple[int, int]]) -> None:
         while self.Candidates:
-            candidate = pop_candidate_func()
-            feasible = self.validate_candidate(candidate)
-            self.update_candidates(candidate)
+            i,j = pop_candidate_func()
+            self.update_candidates((i, j))
             print('candidates number:', len(self.Candidates))
-            self.CoveredMembers |= set(candidate)
+            feasible = self.validate_candidate((i,j))
+            self.CoveredMembers |= {i, j}
             if feasible:
-                self.Solution.append(candidate)
-                self.MemberPriorities[candidate[0]][candidate[1]] = 1
-                self.update_objective(candidate)
+                self.Solution.append((i,j))
+                self.MemberPriorities[i][j] = 1
+                self.update_objective((i,j))
             else:
                 """
                 We can safely add j->i to Solution if i->j is not feasible.
                 """
-                print(candidate, 'is not feasible')
-                self.Solution.append(candidate[::-1])
-                self.MemberPriorities[candidate[1]][candidate[0]] = 1
-                self.update_objective(candidate[::-1])
+                print(f'{i}->{j} is not feasible')
+                self.Solution.append((j,i))
+                self.MemberPriorities[j][i] = 1
+                self.update_objective((j,i))
 
     def solve(self) -> None:
         self.greedy_solve(self.pop_candidate_from_sorted)

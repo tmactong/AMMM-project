@@ -17,40 +17,40 @@ class LocalSearch(GreedyHeuristic):
             if self.Bids[pair[1]][pair[0]] > self.Bids[pair[0]][pair[1]]:
                 yield pair[::-1]
 
-    def get_potential_flipped_candidates(
+    def get_knockon_pairs(
             self, increasing_bid: int, edges: typing.List[typing.Tuple[int, int]]
     ) -> (typing.List[typing.Tuple[int, int]], int):
-        chosen_candidates = []
+        chosen_knockon_pairs = []
         candidates_bid_decrease = dict(map(lambda _: (_, self.Bids[_[0]][_[1]] - self.Bids[_[1]][_[0]]), edges))
-        bid_decrease = 0
-        _, _, edges = trim_graph(edges)
+        total_bid_decrease = 0
+        edges = trim_graph(edges)
         while edges:
             # edges: [(4, 7), (8, 3), (8, 4), (7, 3), (3, 9), (4, 10), (10, 3), (7, 9), (9, 6), (6, 8), (7, 6), (10, 7), (8, 7)]
             # edges: [(4, 7), (8, 3), (8, 4), (3, 7), (3, 9), (4, 10), (10, 3), (7, 9), (9, 6), (6, 8), (7, 6), (10, 7), (8, 7)]
             # flip (7,3) to (3,7) , no cycles were eliminated!!!.
-            candidates = [(i, j) for i, j in edges if self.Bids[i][j] - self.Bids[j][i] >= 0 and
-                          self.Bids[i][j] - self.Bids[j][i] + bid_decrease < increasing_bid ]
-            if not candidates:
+            candidate_pairs = [(i, j) for i, j in edges if self.Bids[i][j] - self.Bids[j][i] >= 0 and
+                          self.Bids[i][j] - self.Bids[j][i] + total_bid_decrease < increasing_bid ]
+            if not candidate_pairs:
                 print(f'no feasible flipped candidates')
                 return [], -1
-            candidates.sort(key=lambda pair: candidates_bid_decrease[pair])
+            candidate_pairs.sort(key=lambda pair: candidates_bid_decrease[pair])
             # find candidate
             found = False
-            for i,j in candidates:
+            for i,j in candidate_pairs:
                 new_edges = [x for x in edges]
                 new_edges[new_edges.index((i,j))] = (j,i)
-                _, _, new_edges = trim_graph(new_edges)
+                new_edges = trim_graph(new_edges)
                 if len(new_edges) < len(edges):
-                    bid_decrease += self.Bids[i][j] - self.Bids[j][i]
+                    total_bid_decrease += self.Bids[i][j] - self.Bids[j][i]
                     edges = new_edges
-                    chosen_candidates.append((i,j))
+                    chosen_knockon_pairs.append((i,j))
                     print(f'chosen candidate: {(i,j)}')
                     found = True
                     break
             if not found:
                 print(f'no feasible flipped useful candidates')
                 return [], -1
-        return chosen_candidates, bid_decrease
+        return chosen_knockon_pairs, total_bid_decrease
 
     def can_be_flipped(self, pair: typing.Tuple[int, int],knockon_pairs: typing.List[typing.Tuple[int, int]]) -> bool:
         solution = copy.deepcopy(self.Solution)
@@ -76,7 +76,7 @@ class LocalSearch(GreedyHeuristic):
                 print('no loops formed')
                 return True, potential_increasing_bid, pair, []
 
-            candidates, decreasing_bid = self.get_potential_flipped_candidates(potential_increasing_bid, residual_edges)
+            candidates, decreasing_bid = self.get_knockon_pairs(potential_increasing_bid, residual_edges)
             if decreasing_bid == -1:
                 continue
             print('candidates: ', candidates, 'decreasing bid: ', decreasing_bid)
