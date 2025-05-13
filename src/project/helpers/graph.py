@@ -12,7 +12,7 @@ def construct_neighbors(vertices: t.Set[int], edges:t.List[t.Tuple[int, int]]) -
         neighbors[i].append(j)
     return neighbors
 
-def get_topological_order(vertices:t.Set[int],edges: t.List[t.Tuple[int, int]]) -> t.List[int]:
+def topological_sort(vertices:t.Set[int], edges: t.List[t.Tuple[int, int]]) -> t.List[int]:
     topological_order = []
     indegree = dict(map(lambda _: (_, 0), vertices))
     neighbors = construct_neighbors(vertices, edges)
@@ -57,14 +57,14 @@ def trim_graph(edges: t.List[t.Tuple[int, int]]) -> (t.List[t.Tuple[int, int]], 
                     nodes_with_zero_outdegree.append(node)
         while nodes_with_zero_outdegree:
             node = nodes_with_zero_outdegree.pop()
-            for edge, edge_neighbors in neighbors.items():
-                if outdegree[edge] > 0 and node in edge_neighbors:
-                    outdegree[edge] -= 1
+            for vertex, edge_neighbors in neighbors.items():
+                if outdegree[vertex] > 0 and node in edge_neighbors:
+                    outdegree[vertex] -= 1
                     indegree[node] -= 1
-                    if (edge, node) in edges:
-                        edges.remove((edge, node))
-                    if outdegree[edge] == 0:
-                        nodes_with_zero_outdegree.append(edge)
+                    if (vertex, node) in edges:
+                        edges.remove((vertex, node))
+                    if outdegree[vertex] == 0:
+                        nodes_with_zero_outdegree.append(vertex)
                     if indegree[node] == 0:
                         nodes_with_zero_indegree.append(node)
     return edges, indegree, outdegree

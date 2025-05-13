@@ -1,7 +1,7 @@
 import typing
 from collections.abc import Callable
 from src.project.heuristics import HeuristicMethod
-from src.project.helpers.graph import get_topological_order
+from src.project.helpers.graph import topological_sort
 
 
 class GreedyHeuristic(HeuristicMethod):
@@ -18,7 +18,7 @@ class GreedyHeuristic(HeuristicMethod):
         return sorted_candidates.pop(0)
 
     def validate_candidate(self, candidate: typing.Tuple[int, int]) -> bool:
-        topological_order = get_topological_order(self.CoveredMembers, self.Solution + [candidate])
+        topological_order = topological_sort(self.CoveredMembers, self.Solution + [candidate])
         return len(topological_order) == len(self.CoveredMembers)
 
     def greedy_solve(self, pop_candidate_func: Callable[[], typing.Tuple[int, int]]) -> None:
