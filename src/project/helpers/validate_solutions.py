@@ -27,6 +27,6 @@ if __name__ == "__main__":
             print(f'{"#"*30}')
     '''
 
-    validate_solution(solution_file="../result/project.45members/solution.local_search.objective=4794.json")
+    validate_solution(solution_file="../result/project.45members/solution.local_search.objective=4841.json")
     # validate_solution("generated_solution.json")
     # print(generate_all_cycles(5))

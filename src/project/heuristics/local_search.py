@@ -36,7 +36,7 @@ class LocalSearch(GreedyHeuristic):
             vertex_degrees = dict(map(lambda v: (v, indegree[v] + outdegree[v]), vertices))
             candidate_pairs.sort(
                 key=lambda pair: (
-                    vertex_degrees[pair[0]] + vertex_degrees[pair[1]],candidates_bid_decrease[pair]
+                    vertex_degrees[pair[0]] + vertex_degrees[pair[1]], candidates_bid_decrease[pair]
                 ),
                 reverse=True
             )
@@ -81,12 +81,12 @@ class LocalSearch(GreedyHeuristic):
             if not residual_edges:
                 print('no loops formed')
                 return True, potential_increasing_bid, pair, []
-            candidates, decreasing_bid = self.get_knockon_pairs(potential_increasing_bid, residual_edges)
+            knockon_pairs, decreasing_bid = self.get_knockon_pairs(potential_increasing_bid, residual_edges)
             if decreasing_bid == -1:
                 continue
-            print('candidates: ', candidates, 'decreasing bid: ', decreasing_bid)
-            if self.can_be_flipped(pair, candidates):
-                return True, potential_increasing_bid - decreasing_bid, pair, candidates
+            print('knockon pairs: ', knockon_pairs, 'decreasing bid: ', decreasing_bid)
+            if self.can_be_flipped(pair, knockon_pairs):
+                return True, potential_increasing_bid - decreasing_bid, pair, knockon_pairs
         return False, 0, [], []
 
     def solve(self) -> None:

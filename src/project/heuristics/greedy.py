@@ -1,7 +1,7 @@
 import typing
 from collections.abc import Callable
 from src.project.heuristics import HeuristicMethod
-from src.project.helpers.graph import trim_graph
+from src.project.helpers.graph import get_topological_order
 
 
 class GreedyHeuristic(HeuristicMethod):
@@ -18,17 +18,16 @@ class GreedyHeuristic(HeuristicMethod):
         return sorted_candidates.pop(0)
 
     def validate_candidate(self, candidate: typing.Tuple[int, int]) -> bool:
-        #_, residual_edges = topological_sort(self.Solution + [candidate])
-        residual_edges,_,_ = trim_graph(self.Solution + [candidate])
-        return len(residual_edges) == 0
+        topological_order = get_topological_order(self.CoveredMembers, self.Solution + [candidate])
+        return len(topological_order) == len(self.CoveredMembers)
 
     def greedy_solve(self, pop_candidate_func: Callable[[], typing.Tuple[int, int]]) -> None:
         while self.Candidates:
             i,j = pop_candidate_func()
             self.update_candidates((i, j))
+            self.CoveredMembers |= {i, j}
             print('candidates number:', len(self.Candidates))
             feasible = self.validate_candidate((i,j))
-            self.CoveredMembers |= {i, j}
             if feasible:
                 self.Solution.append((i,j))
                 self.MemberPriorities[i][j] = 1
