@@ -8,12 +8,19 @@ class Grasp(LocalSearch):
 
     Alpha: float
     MaxRetryTimes: int = 10
+    DoLocalSearch: bool = False
 
     def __init__(
-            self, member_count: int, bids: typing.Dict[int, typing.Dict[int, int]], project_name: str, alpha: float = 0
+            self,
+            member_count: int,
+            bids: typing.Dict[int, typing.Dict[int, int]],
+            project_name: str,
+            alpha: float = 0,
+            do_local_search: typing.Optional[bool] = None
     ) -> None:
         super().__init__(member_count, bids, project_name)
         self.Alpha = alpha
+        self.DoLocalSearch = True if do_local_search else False
 
     def pop_random_candidate_from_rcl(self) -> typing.Tuple[int, int]:
         sorted_candidates = self.sort_candidates_by_quality()
@@ -32,10 +39,11 @@ class Grasp(LocalSearch):
             print(f'{"*"*20} Greedy Construction Phase {"*"*20}')
             self.greedy_solve(self.pop_random_candidate_from_rcl)
             print(f"Greedy Objective: {self.Objective}")
-            """ Local Search Phase """
-            print(f'{"*"*20} Local Search Phase {"*"*20}')
-            super().solve()
-            print(f"Local Search Objective: {self.Objective}")
+            if self.DoLocalSearch:
+                """ Local Search Phase """
+                print(f'{"*"*20} Local Search Phase {"*"*20}')
+                super().solve()
+                print(f"Local Search Objective: {self.Objective}")
             dump_solution(
                 'grasp', self.ProjectName, start_time, self.Objective, self.Solution,
                 self.MemberPriorities, self.Bids, alpha=self.Alpha, retry=retry)
