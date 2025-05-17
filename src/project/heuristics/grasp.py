@@ -7,8 +7,9 @@ from src.project.helpers.dump_solution import dump_solution
 class Grasp(LocalSearch):
 
     Alpha: float
-    MaxRetryTimes: int = 10
+    MaxRetryTimes: int = 1
     DoLocalSearch: bool = False
+    DrawGraph: bool = False
 
     def __init__(
             self,
@@ -16,14 +17,17 @@ class Grasp(LocalSearch):
             bids: typing.Dict[int, typing.Dict[int, int]],
             project_name: str,
             alpha: float = 0,
-            do_local_search: typing.Optional[bool] = None
+            do_local_search: typing.Optional[bool] = None,
+            draw_graph: bool = False
     ) -> None:
         super().__init__(member_count, bids, project_name)
         self.Alpha = alpha
         self.DoLocalSearch = True if do_local_search else False
+        self.DrawGraph = draw_graph
 
     def pop_random_candidate_from_rcl(self) -> typing.Tuple[int, int]:
         sorted_candidates = self.sort_candidates_by_quality()
+        self.SortedCandidates = sorted_candidates
         max_bid = self.Bids[sorted_candidates[0][0]][sorted_candidates[0][1]]
         min_bid = self.Bids[sorted_candidates[-1][0]][sorted_candidates[-1][1]]
         rcl = [x for x in sorted_candidates if self.Bids[x[0]][x[1]] >= max_bid - self.Alpha * (max_bid - min_bid)]
@@ -37,7 +41,7 @@ class Grasp(LocalSearch):
             self.initialize_variables()
             """ Greedy Construction Phase"""
             print(f'{"*"*20} Greedy Construction Phase {"*"*20}')
-            self.greedy_solve(self.pop_random_candidate_from_rcl)
+            self.greedy_solve(self.pop_random_candidate_from_rcl, method='grasp',alpha=self.Alpha)
             print(f"Greedy Objective: {self.Objective}")
             if self.DoLocalSearch:
                 """ Local Search Phase """

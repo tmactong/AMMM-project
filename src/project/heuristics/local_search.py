@@ -18,7 +18,7 @@ class LocalSearch(GreedyHeuristic):
                 yield pair[::-1]
 
     def get_knockon_pairs(
-            self, increasing_bid: int, edges: typing.List[typing.Tuple[int, int]]
+            self, target_pair: typing.Tuple[int, int],increasing_bid: int, edges: typing.List[typing.Tuple[int, int]]
     ) -> (typing.List[typing.Tuple[int, int]], int):
         chosen_knockon_pairs = []
         candidates_bid_decrease = dict(map(lambda _: (_, self.Bids[_[1]][_[0]] - self.Bids[_[0]][_[1]]), edges))
@@ -40,6 +40,16 @@ class LocalSearch(GreedyHeuristic):
                 ),
                 reverse=True
             )
+            if self.DrawGraph:
+                solution = copy.deepcopy(self.Solution)
+                solution[solution.index(target_pair[::-1])] = target_pair
+                for pair in chosen_knockon_pairs:
+                    solution[solution.index(pair)] = pair[::-1]
+                self.plot_graph(
+                    'local_search', solution, infeasible_edge=target_pair, draw_cycle=True,
+                    selected_edges=chosen_knockon_pairs,
+                    candidate_degrees={(i,j):vertex_degrees[i] + vertex_degrees[j] for i, j in candidate_pairs}
+                )
             # find candidate
             found = False
             for i,j in candidate_pairs:
@@ -56,6 +66,15 @@ class LocalSearch(GreedyHeuristic):
             if not found:
                 print(f'no feasible flipped useful candidates')
                 return [], -1
+        if self.DrawGraph:
+            solution = copy.deepcopy(self.Solution)
+            solution[solution.index(target_pair[::-1])] = target_pair
+            for pair in chosen_knockon_pairs:
+                solution[solution.index(pair)] = pair[::-1]
+            self.plot_graph(
+                'local_search', solution, infeasible_edge=target_pair, draw_cycle=True,
+                selected_edges=chosen_knockon_pairs
+            )
         return chosen_knockon_pairs, total_bid_decrease
 
     def can_be_flipped(self, pair: typing.Tuple[int, int],knockon_pairs: typing.List[typing.Tuple[int, int]]) -> bool:
@@ -71,40 +90,49 @@ class LocalSearch(GreedyHeuristic):
     def flip_pairs_with_improvement(self, excluded_pairs: typing.List[typing.Tuple[int, int]]) -> (
             bool, int, typing.Tuple[int, int], typing.List[typing.Tuple[int, int]]) :
         print(f'{"#"*20} EXAMINING PAIRS {excluded_pairs} {"#" *20}')
-        for pair in excluded_pairs:
-            print(f'{"="*20} EXAMINING PAIR {pair} {"=" *20}')
-            print(f'{pair} -> {pair[::-1]}: {self.Bids[pair[0]][pair[1]]} -> {self.Bids[pair[1]][pair[0]]}')
-            potential_increasing_bid = self.Bids[pair[0]][pair[1]] - self.Bids[pair[1]][pair[0]]
+        for i,j in excluded_pairs:
+            print(f'{"="*20} EXAMINING PAIR {(i,j)} {"=" *20}')
+            print(f'{(i,j)} -> {(j,i)}: {self.Bids[i][j]} -> {self.Bids[j][i]}')
+            potential_increasing_bid = self.Bids[i][j] - self.Bids[j][i]
             solution = copy.deepcopy(self.Solution)
-            solution[solution.index(pair[::-1])] = pair
+            solution[solution.index((j,i))] = (i,j)
+            if self.DrawGraph:
+                self.plot_graph('local_search', solution, infeasible_edge=(i, j), draw_cycle=True)
             residual_edges, _, _ = trim_graph(solution)
             if not residual_edges:
                 print('no loops formed')
-                return True, potential_increasing_bid, pair, []
-            knockon_pairs, decreasing_bid = self.get_knockon_pairs(potential_increasing_bid, residual_edges)
+                return True, potential_increasing_bid, (i,j), []
+            knockon_pairs, decreasing_bid = self.get_knockon_pairs((i,j),potential_increasing_bid, residual_edges)
             if decreasing_bid == -1:
                 continue
             print('knockon pairs: ', knockon_pairs, 'decreasing bid: ', decreasing_bid)
-            if self.can_be_flipped(pair, knockon_pairs):
-                return True, potential_increasing_bid - decreasing_bid, pair, knockon_pairs
+            if self.can_be_flipped((i,j), knockon_pairs):
+                return True, potential_increasing_bid - decreasing_bid, (i,j), knockon_pairs
         return False, 0, [], []
 
     def solve(self) -> None:
         super().solve()
+        if self.DrawGraph:
+            self.DrawCounter = 0
+            self.plot_graph('local_search',self.Solution)
         pairs_with_higher_bid = list(self.obtain_pairs_with_higher_bid())
         flipped, increased_bid, pair, knocked_on_pairs = self.flip_pairs_with_improvement(pairs_with_higher_bid)
         while flipped:
             print('Updating Solution...')
             print(f"Objective: {self.Objective} -> {self.Objective + increased_bid}")
             print(f"solution: flipped {pair[::-1]} -> {pair}")
-            self.Solution[self.Solution.index(pair[::-1])] = pair
-            self.Objective += increased_bid
-            self.MemberPriorities[pair[0]][pair[1]] = 1
-            self.MemberPriorities[pair[1]][pair[0]] = 0
             for candidate in knocked_on_pairs:
                 print(f'solution: flipped {candidate} -> {candidate[::-1]}')
                 self.Solution[self.Solution.index(candidate)] = candidate[::-1]
                 self.MemberPriorities[candidate[0]][candidate[1]] = 0
                 self.MemberPriorities[candidate[1]][candidate[0]] = 1
+            self.Solution[self.Solution.index(pair[::-1])] = pair
+            self.Objective += increased_bid
+            self.MemberPriorities[pair[0]][pair[1]] = 1
+            self.MemberPriorities[pair[1]][pair[0]] = 0
+            if self.DrawGraph:
+                self.plot_graph('local_search',self.Solution)
             pairs_with_higher_bid = list(self.obtain_pairs_with_higher_bid())
             flipped, increased_bid, pair, knocked_on_pairs = self.flip_pairs_with_improvement(pairs_with_higher_bid)
+        if self.DrawGraph:
+            self.plot_graph('local_search', self.Solution)
