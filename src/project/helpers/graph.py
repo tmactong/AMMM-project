@@ -1,18 +1,21 @@
 import typing as t
 
+
 def get_vertices_from_edges(edges: t.List[t.Tuple[int, int]]) -> t.Set[int]:
     vertices = set()
     for edge in edges:
         vertices |= set(edge)
     return vertices
 
-def construct_neighbors(vertices: t.Set[int], edges:t.List[t.Tuple[int, int]]) -> t.Dict[int,t.List[int]]:
-    neighbors = dict(map(lambda _:(_, []), vertices))
+
+def construct_neighbors(vertices: t.Set[int], edges: t.List[t.Tuple[int, int]]) -> t.Dict[int, t.List[int]]:
+    neighbors = dict(map(lambda _: (_, []), vertices))
     for i, j in edges:
         neighbors[i].append(j)
     return neighbors
 
-def topological_sort(vertices:t.Set[int], edges: t.List[t.Tuple[int, int]]) -> t.List[int]:
+
+def topological_sort(vertices: t.Set[int], edges: t.List[t.Tuple[int, int]]) -> t.List[int]:
     topological_order = []
     indegree = dict(map(lambda _: (_, 0), vertices))
     neighbors = construct_neighbors(vertices, edges)
@@ -30,7 +33,9 @@ def topological_sort(vertices:t.Set[int], edges: t.List[t.Tuple[int, int]]) -> t
     return topological_order
 
 
-def trim_graph(edges: t.List[t.Tuple[int, int]]) -> (t.List[t.Tuple[int, int]], t.Dict[int, int], t.Dict[int, int]):
+def trim_graph(edges: t.List[t.Tuple[int, int]]) -> (
+        t.List[t.Tuple[int, int]], t.Dict[int, int], t.Dict[int, int]):
+    print('before trim graph', edges)
     vertices = get_vertices_from_edges(edges)
     neighbors = construct_neighbors(vertices, edges)
     indegree = dict(map(lambda _: (_, 0), vertices))
@@ -67,4 +72,5 @@ def trim_graph(edges: t.List[t.Tuple[int, int]]) -> (t.List[t.Tuple[int, int]], 
                         nodes_with_zero_outdegree.append(vertex)
                     if indegree[node] == 0:
                         nodes_with_zero_indegree.append(node)
+    print('after trim graph', edges)
     return edges, indegree, outdegree

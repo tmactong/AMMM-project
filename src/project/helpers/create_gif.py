@@ -26,6 +26,6 @@ def create_gif(folder:str, output_gif_filename:str):
 
 if __name__ == '__main__':
     create_gif(
-        '../assets/image/solution/project.4/grasp',
-        '../assets/image/solution-project.4.grasp.gif'
+        '../assets/image/solution/ts',
+        '../assets/image/ts.gif'
     )

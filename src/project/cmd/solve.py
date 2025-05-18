@@ -50,7 +50,7 @@ def main():
 
 if __name__ == '__main__':
     #main()
-    run_main('../testdata/project.4.dat', 'greedy', draw=True)
+    run_main('../testdata/project.4.dat', 'local_search')
     # run_main('../testdata/project.4.dat', 'grasp', draw=True, alpha=0.2)
     # project 6: 8 members
     #for i in range(1, 11):

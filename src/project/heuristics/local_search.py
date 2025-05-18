@@ -18,12 +18,12 @@ class LocalSearch(GreedyHeuristic):
                 yield pair[::-1]
 
     def get_knockon_pairs(
-            self, target_pair: typing.Tuple[int, int],increasing_bid: int, edges: typing.List[typing.Tuple[int, int]]
+            self, target_pair: typing.Tuple[int, int],increasing_bid: int, edges: typing.List[typing.Tuple[int, int]],
+            indegree: typing.Dict[int, int], outdegree: typing.Dict[int, int]
     ) -> (typing.List[typing.Tuple[int, int]], int):
         chosen_knockon_pairs = []
         candidates_bid_decrease = dict(map(lambda _: (_, self.Bids[_[1]][_[0]] - self.Bids[_[0]][_[1]]), edges))
         total_bid_decrease = 0
-        edges, indegree, outdegree = trim_graph(edges)
         while edges:
             # edges: [(4, 7), (8, 3), (8, 4), (7, 3), (3, 9), (4, 10), (10, 3), (7, 9), (9, 6), (6, 8), (7, 6), (10, 7), (8, 7)]
             # edges: [(4, 7), (8, 3), (8, 4), (3, 7), (3, 9), (4, 10), (10, 3), (7, 9), (9, 6), (6, 8), (7, 6), (10, 7), (8, 7)]
@@ -40,6 +40,8 @@ class LocalSearch(GreedyHeuristic):
                 ),
                 reverse=True
             )
+            print('candidate_pairs', candidate_pairs)
+            print('edge degrees:', {(i,j):vertex_degrees[i] + vertex_degrees[j] for i, j in candidate_pairs})
             if self.DrawGraph:
                 solution = copy.deepcopy(self.Solution)
                 solution[solution.index(target_pair[::-1])] = target_pair
@@ -53,6 +55,7 @@ class LocalSearch(GreedyHeuristic):
             # find candidate
             found = False
             for i,j in candidate_pairs:
+                print(f'chosen candidate: {(i, j)}')
                 new_edges = [x for x in edges]
                 new_edges[new_edges.index((i,j))] = (j,i)
                 new_edges, indegree, outdegree = trim_graph(new_edges)
@@ -60,7 +63,7 @@ class LocalSearch(GreedyHeuristic):
                     total_bid_decrease += self.Bids[i][j] - self.Bids[j][i]
                     edges = new_edges
                     chosen_knockon_pairs.append((i,j))
-                    print(f'chosen candidate: {(i,j)}')
+                    print('chosen knockon_pairs', chosen_knockon_pairs)
                     found = True
                     break
             if not found:
@@ -98,11 +101,12 @@ class LocalSearch(GreedyHeuristic):
             solution[solution.index((j,i))] = (i,j)
             if self.DrawGraph:
                 self.plot_graph('local_search', solution, infeasible_edge=(i, j), draw_cycle=True)
-            residual_edges, _, _ = trim_graph(solution)
+            residual_edges, indegree, outdegree = trim_graph(solution)
             if not residual_edges:
                 print('no loops formed')
                 return True, potential_increasing_bid, (i,j), []
-            knockon_pairs, decreasing_bid = self.get_knockon_pairs((i,j),potential_increasing_bid, residual_edges)
+            knockon_pairs, decreasing_bid = self.get_knockon_pairs(
+                (i,j),potential_increasing_bid, residual_edges, indegree, outdegree)
             if decreasing_bid == -1:
                 continue
             print('knockon pairs: ', knockon_pairs, 'decreasing bid: ', decreasing_bid)
