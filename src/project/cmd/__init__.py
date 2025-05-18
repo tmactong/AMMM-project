@@ -26,28 +26,25 @@ class Solver:
     start_time: int
 
     def __init__(self, data_file: str, algorithm: ALGORITHM,
-                 solution_file: typing.Optional[str] = None,
-                 alpha: typing.Optional[float] = None) -> None:
+                 alpha: typing.Optional[float] = None, do_local_search: typing.Optional[bool] = None) -> None:
         self.data_file = data_file
         self.MemberCount, self.Bids = data_parser(self.data_file)
         self.Algorithm = algorithm
-        self.solution_file = solution_file
         self.Alpha = alpha
+        self.DoLocalSearch = do_local_search
         self.start_time = int(time.time())
         self.ProjectName = os.path.basename(data_file).lstrip('project.').rstrip('.dat')
 
     def __enter__(self) -> HeuristicMethod:
-        if self.Algorithm in [Algorithm.GREEDY, Algorithm.GRASP] and self.solution_file:
-            print(f"can't load greedy solution for algorithm {self.Algorithm}, ignoring solution file")
         if self.Algorithm in [Algorithm.LOCAL_SEARCH, Algorithm.GREEDY] and self.Alpha:
             print(f"can't set alpha for algorithm {self.Algorithm}, ignoring alpha")
         if self.Algorithm == Algorithm.GREEDY:
             self.SolverInstance = GreedyHeuristic(self.MemberCount, self.Bids, self.ProjectName)
         elif self.Algorithm == Algorithm.LOCAL_SEARCH:
-            self.SolverInstance = LocalSearch(
-                self.MemberCount, self.Bids, self.ProjectName, solution_file=self.solution_file)
+            self.SolverInstance = LocalSearch(self.MemberCount, self.Bids, self.ProjectName)
         elif self.Algorithm == Algorithm.GRASP:
-            self.SolverInstance = Grasp(self.MemberCount, self.Bids, self.ProjectName, alpha=self.Alpha)
+            self.SolverInstance = Grasp(
+                self.MemberCount, self.Bids, self.ProjectName, alpha=self.Alpha, do_local_search=self.DoLocalSearch)
         else:
             raise NotImplementedError
         return self.SolverInstance
@@ -55,8 +52,7 @@ class Solver:
     def __exit__(self, *args) -> None:
         print('Solution:')
         for s in sorted(self.SolverInstance.Solution):
-            if self.Bids[s[0]][s[1]] > 0:
-                print(s[0], '->', s[1])
+            print(s[0], '->', s[1])
         print('Objective:', self.SolverInstance.Objective)
         dump_solution(
             self.Algorithm, self.ProjectName, self.start_time,

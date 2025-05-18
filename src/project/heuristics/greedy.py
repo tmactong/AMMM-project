@@ -1,18 +1,10 @@
 import typing
 from collections.abc import Callable
 from src.project.heuristics import HeuristicMethod
-from src.project.helpers.cycles_generator import generate_branches, generate_all_permutations
-
-CHOOSING_METHODS_MAGIC_NUMBER = 68
+from src.project.helpers.graph import topological_sort
 
 
 class GreedyHeuristic(HeuristicMethod):
-
-    def update_covered_pairs(self, member_pair: typing.Tuple[int, int]) -> None:
-        self.CoveredPairs.append(member_pair)
-        self.CoveredPairs.append(member_pair[::-1])
-        self.NotCoveredPairs.remove(member_pair)
-        self.NotCoveredPairs.remove(member_pair[::-1])
 
     def update_candidates(self, member_pair: typing.Tuple[int, int]) -> None:
         self.Candidates.remove(member_pair)
@@ -25,67 +17,29 @@ class GreedyHeuristic(HeuristicMethod):
         sorted_candidates = self.sort_candidates_by_quality()
         return sorted_candidates.pop(0)
 
-    def _newly_constructed_cycles(self, member_pair: typing.Tuple[int, int]) -> typing.Iterable[typing.List[int]]:
-        for branch in generate_branches([member_pair[1]], self.CoveredPairs):
-            if member_pair[0] in branch:
-                yield branch[:branch.index(member_pair[0])+1]
-
-    def _uniq_newly_constructed_cycles(self, member_pair: typing.Tuple[int, int]) -> typing.List[typing.List[int]]:
-        uniq_cycles = list()
-        for cycle in self._newly_constructed_cycles(member_pair):
-            if cycle not in uniq_cycles:
-                uniq_cycles.append(cycle)
-        return uniq_cycles
-
-    def uniq_newly_constructed_cycles(self, member_pair: typing.Tuple[int, int]) -> typing.Iterable[typing.List[int]]:
-        all_cycles = generate_all_permutations(self.MemberCount, member_pair)
-        not_covered_pairs = [list(x) for x in self.NotCoveredPairs]
-        for cycle in all_cycles:
-            found = True
-            for not_covered_pair in not_covered_pairs:
-                if any(not_covered_pair == cycle[i:i + 2] for i in range(len(cycle) - 1)):
-                    found = False
-                    break
-            if found:
-                yield cycle
-
     def validate_candidate(self, candidate: typing.Tuple[int, int]) -> bool:
-        """
-        By testing I found that when the length of self.CoveredPairs is less than 68, using self.CoveredPairs to
-        generate cycles is more efficient, and when the length of self.CoveredPairs is greater than 68, using
-        self.UncoveredPairs to generate cycles is more efficient.
-        """
-        if len(self.CoveredPairs) < CHOOSING_METHODS_MAGIC_NUMBER:
-            new_cycles = self._uniq_newly_constructed_cycles(candidate)
-        else:
-            new_cycles = self.uniq_newly_constructed_cycles(candidate)
-        for cycle in new_cycles:
-            cycle_priority = 0
-            for idx in range(len(cycle) - 1):
-                cycle_priority += self.MemberPriorities[cycle[idx]][cycle[idx + 1]]
-            if cycle_priority + 1 == len(cycle):
-                return False
-        return True
+        topological_order = topological_sort(self.CoveredMembers, self.Solution + [candidate])
+        return len(topological_order) == len(self.CoveredMembers)
 
     def greedy_solve(self, pop_candidate_func: Callable[[], typing.Tuple[int, int]]) -> None:
         while self.Candidates:
-            candidate = pop_candidate_func()
-            feasible = self.validate_candidate(candidate)
-            self.update_candidates(candidate)
+            i,j = pop_candidate_func()
+            self.update_candidates((i, j))
+            self.CoveredMembers |= {i, j}
             print('candidates number:', len(self.Candidates))
-            self.update_covered_pairs(candidate)
+            feasible = self.validate_candidate((i,j))
             if feasible:
-                self.Solution.append(candidate)
-                self.MemberPriorities[candidate[0]][candidate[1]] = 1
-                self.update_objective(candidate)
+                self.Solution.append((i,j))
+                self.MemberPriorities[i][j] = 1
+                self.update_objective((i,j))
             else:
                 """
                 We can safely add j->i to Solution if i->j is not feasible.
                 """
-                print(candidate, 'is not feasible')
-                self.Solution.append(candidate[::-1])
-                self.MemberPriorities[candidate[1]][candidate[0]] = 1
-                self.update_objective(candidate[::-1])
+                print(f'{i}->{j} is not feasible')
+                self.Solution.append((j,i))
+                self.MemberPriorities[j][i] = 1
+                self.update_objective((j,i))
 
     def solve(self) -> None:
         self.greedy_solve(self.pop_candidate_from_sorted)

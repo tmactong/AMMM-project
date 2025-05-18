@@ -1,5 +1,4 @@
 import typing
-import json
 import itertools
 
 
@@ -11,30 +10,13 @@ class HeuristicMethod:
     Solution: typing.List[typing.Tuple[int, int]]
     MemberPriorities: typing.Dict[typing.Any, typing.Dict[typing.Any, int]]
     Objective: int
-    CoveredPairs: typing.List[typing.Tuple[int, int]]
-    NotCoveredPairs: typing.List[typing.Tuple[int, int]]
+    CoveredMembers: typing.Set[int]
 
-    def __init__(self, member_count: int, bids: typing.Dict[int, typing.Dict[int, int]], project_name: str,
-                 solution_file: typing.Optional[str] = None) -> None:
+    def __init__(self, member_count: int, bids: typing.Dict[int, typing.Dict[int, int]], project_name: str,) -> None:
         self.MemberCount = member_count
         self.Bids = bids
         self.ProjectName = project_name
         self.initialize_variables()
-        self.solution_file = solution_file
-        if self.solution_file:
-            print('import solution from file:', self.solution_file)
-            self.load_solution_file()
-
-    def load_solution_file(self):
-        with open(self.solution_file, 'r') as f:
-            greedy_result = json.load(f)
-            solution = greedy_result['Solution']
-            self.Solution = [tuple(x) for x in solution]
-            member_priorities = greedy_result['MemberPriorities']
-            for i in member_priorities:
-                for j in member_priorities[i]:
-                    self.MemberPriorities[int(i)][int(j)] = member_priorities[i][j]
-            self.Objective = greedy_result['Objective']
 
     def initialize_variables(self) -> None:
         self.Solution = list()
@@ -43,9 +25,9 @@ class HeuristicMethod:
                 _, dict(map(lambda _: (_, 0), range(1, self.MemberCount + 1)))
             ), range(1, self.MemberCount + 1)))
         self.Objective = 0
-        self.CoveredPairs = []
-        self.NotCoveredPairs = list(itertools.permutations(range(1, self.MemberCount + 1), 2))
-        self.Candidates = list(itertools.permutations(range(1, self.MemberCount + 1), 2))
+        self.Candidates = [(i,j) for i,j in itertools.permutations(range(1, self.MemberCount + 1), 2)
+                           if self.Bids[i][j] != 0 or self.Bids[j][i] != 0]
+        self.CoveredMembers = set()
 
     def update_objective(self, pair: typing.Tuple[int, int]) -> None:
         self.Objective += self.Bids[pair[0]][pair[1]]
