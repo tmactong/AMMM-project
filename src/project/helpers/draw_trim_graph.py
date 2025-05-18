@@ -19,8 +19,7 @@ Bids={
 
 counter = 0
 
-def trim_graph(edges: t.List[t.Tuple[int, int]]) -> (
-        t.List[t.Tuple[int, int]], t.Dict[int, int], t.Dict[int, int]):
+def calculate_degree(edges: t.List[t.Tuple[int, int]]) -> (t.Dict[int, int], t.Dict[int, int]):
     vertices = get_vertices_from_edges(edges)
     neighbors = construct_neighbors(vertices, edges)
     indegree = dict(map(lambda _: (_, 0), vertices))
@@ -29,9 +28,24 @@ def trim_graph(edges: t.List[t.Tuple[int, int]]) -> (
         outdegree[vertex] = len(neighbors[vertex])
         for neighbor in neighbors[vertex]:
             indegree[neighbor] += 1
+    return indegree, outdegree
+
+def trim_graph(edges: t.List[t.Tuple[int, int]]) -> (
+        t.List[t.Tuple[int, int]], t.Dict[int, int], t.Dict[int, int]):
+    vertices = get_vertices_from_edges(edges)
+    neighbors = construct_neighbors(vertices, edges)
+    dropped_vertices = set()
+    indegree = dict(map(lambda _: (_, 0), vertices))
+    outdegree = dict(map(lambda _: (_, 0), vertices))
+    _indegree, _outdegree = calculate_degree(edges)
+    for vertex in vertices:
+        outdegree[vertex] = len(neighbors[vertex])
+        for neighbor in neighbors[vertex]:
+            indegree[neighbor] += 1
     nodes_with_zero_indegree = [vertex for vertex in vertices if indegree[vertex] == 0]
     nodes_with_zero_outdegree = [vertex for vertex in vertices if outdegree[vertex] == 0]
     previous_edges = []
+    plot_graph(edges, indegree=_indegree, outdegree=_outdegree, draw_degree_table=True)
     while len(previous_edges) != len(edges):
         previous_edges = [x for x in edges]
         while nodes_with_zero_indegree:
@@ -41,7 +55,14 @@ def trim_graph(edges: t.List[t.Tuple[int, int]]) -> (
                 outdegree[node] -= 1
                 if (node, neighbor) in edges:
                     edges.remove((node, neighbor))
-                    plot_graph(edges)
+                    _indegree, _outdegree = calculate_degree(edges)
+                    dropped_vertices |= set([x for x in vertices if x not in _indegree])
+                    for v in _indegree:
+                        if _indegree[v] == 0 and _outdegree[v] == 0:
+                            dropped_vertices.add(v)
+                    print(f'removing edge: {(node,neighbor)}')
+                    plot_graph(edges, indegree=_indegree, outdegree=_outdegree, draw_degree_table=True,
+                               selected_vertex=node, dropped_vertices=dropped_vertices, selected_degree='indegree')
                 if indegree[neighbor] == 0:
                     nodes_with_zero_indegree.append(neighbor)
                 if outdegree[node] == 0:
@@ -54,11 +75,20 @@ def trim_graph(edges: t.List[t.Tuple[int, int]]) -> (
                     indegree[node] -= 1
                     if (vertex, node) in edges:
                         edges.remove((vertex, node))
-                        plot_graph(edges)
+                        _indegree, _outdegree = calculate_degree(edges)
+                        dropped_vertices |= set([x for x in vertices if x not in _indegree])
+                        for v in _indegree:
+                            if _indegree[v] == 0 and _outdegree[v] == 0:
+                                dropped_vertices.add(v)
+                        print(f'removing edge: {vertex, node}')
+                        plot_graph(
+                            edges, indegree=_indegree, outdegree=_outdegree, draw_degree_table=True,
+                            selected_vertex=node,dropped_vertices=dropped_vertices, selected_degree='outdegree')
                     if outdegree[vertex] == 0:
                         nodes_with_zero_outdegree.append(vertex)
                     if indegree[node] == 0:
                         nodes_with_zero_indegree.append(node)
+    print('edges:', edges)
     return edges, indegree, outdegree
 
 def get_edge_colors(
@@ -72,6 +102,31 @@ def get_edge_colors(
         if edge == selected_edge[::-1]:
             edge_colors[idx] = 'yellow'
     return edge_colors
+
+def get_degree_table(rows: int, indegree: t.Dict[int, int],
+                     outdegree: t.Dict[int, int], selected_vertex: int,selected_degree: t.Literal['indegree', 'outdegree'],
+                     dropped_vertices: t.List[int]):
+    if dropped_vertices is None:
+        dropped_vertices = []
+    columns = ('Edge', 'Indegree', 'Outdegree')
+    cell_text = [[''] * 3 for _ in range(rows)]
+    cell_colors = [['white'] * 3 for _ in range(rows)]
+    sorted_vertices = sorted(indegree.keys(), key=lambda vertex: indegree[vertex])
+    for idx, vertex in enumerate(sorted_vertices):
+        cell_text[idx][0] = f'{vertex}'
+        cell_text[idx][1] = f'{indegree[vertex]}'
+        cell_text[idx][2] = f'{outdegree[vertex]}'
+        if vertex == selected_vertex:
+            if selected_degree == 'indegree':
+                cell_colors[idx][1] = 'yellow'
+            else:
+                cell_colors[idx][2] = 'yellow'
+    for idx in range(len(dropped_vertices)):
+        cell_text[idx+len(sorted_vertices)][0] = f'{list(dropped_vertices)[idx]}'
+        cell_text[idx+len(sorted_vertices)][1] = str(0)
+        cell_text[idx+len(sorted_vertices)][2] = str(0)
+        cell_colors[idx+len(sorted_vertices)] = ['green', 'green', 'green']
+    return cell_text, columns, cell_colors, [0.333, 0.333, 0.333]
 
 def get_drawing_table(
             rows: int, chosen_edges: t.List[t.Tuple[int, int]],
@@ -98,14 +153,21 @@ def get_drawing_table(
 def plot_graph(
         edges: t.List[t.Tuple[int, int]],
         selected_edge: t.Optional[t.Tuple[int, int]] = None,
-        draw_table: bool = False,
+        draw_cand_table: bool = False,
         rows: int = 8,
         candidate_degrees: t.Optional[t.Dict[t.Tuple[int, int], int]] = None,
         candidates: t.Optional[t.List[t.Tuple[int, int]]] = None,
         chosen_edges: t.Optional[t.List[t.Tuple[int, int]]] = None,
+        draw_degree_table: bool = False,
+        indegree: t.Dict[int, int] = None,
+        outdegree: t.Dict[int, int] = None,
+        selected_vertex: t.Optional[int] = None,
+        selected_degree: t.Literal['indegree', 'outdegree'] = 'indegree',
+        dropped_vertices: t.List[int] = None
 ) -> None:
     global counter
     counter += 1
+    print('counter:', counter)
     graph = nx.DiGraph()
     graph.add_nodes_from(range(1, 11))
     graph.add_edges_from(edges)
@@ -113,7 +175,6 @@ def plot_graph(
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5), gridspec_kw={'width_ratios': [10, 6]})
     nx.draw_networkx_nodes(graph, pos, node_size=1500, node_color='skyblue', ax=ax1)
     nx.draw_networkx_labels(graph, pos, ax=ax1)
-    edge_labels = {(i, j): Bids[i][j] for i, j in graph.edges()}
     red_edges = set()
     cycles = list(nx.simple_cycles(graph))
     for cycle in cycles:
@@ -123,12 +184,21 @@ def plot_graph(
     edge_colors = get_edge_colors(graph.edges(), red_edges, selected_edge)
     nx.draw_networkx_edges(
         graph, pos, arrows=True, node_size=1500, arrowsize=20, arrowstyle='->', edge_color=edge_colors, ax=ax1)
-    nx.draw_networkx_edge_labels(graph, pos, edge_labels=edge_labels, ax=ax1)
-    if draw_table:
+    if draw_cand_table:
+        edge_labels = {(i, j): Bids[i][j] for i, j in graph.edges()}
+        nx.draw_networkx_edge_labels(graph, pos, edge_labels=edge_labels, ax=ax1)
         cell_text, columns, cell_colors, column_width = get_drawing_table(
             rows, chosen_edges, candidate_edges=candidates, selected_edge=selected_edge, candidate_degrees=candidate_degrees)
         table = ax2.table(
             cellText=cell_text, colLabels=columns, cellColours=cell_colors, colWidths=column_width, bbox=[0, 0, 1, 1])
+        table.auto_set_font_size(False)
+        table.set_fontsize(12)
+        table.scale(1, 1)
+    if draw_degree_table:
+        cell_text, columns, cell_colors, column_width = get_degree_table(
+            10, indegree, outdegree, selected_vertex, selected_degree, dropped_vertices)
+        table = ax2.table(
+            cellText=cell_text, colLabels=columns, cellColours=cell_colors, colWidths=column_width, bbox=[0, 0, 0.8, 1])
         table.auto_set_font_size(False)
         table.set_fontsize(12)
         table.scale(1, 1)
@@ -188,50 +258,49 @@ edges = [
 ]
 
 def main():
-    plot_graph(edges)
     trim_graph(edges)
     # (6, 10)
     plot_graph(
         [(9, 10), (6, 9), (1, 10), (3, 1), (10, 3), (3, 6), (3, 9), (10, 6), (6, 1)],
-        selected_edge=(6, 10),draw_table=True,rows=10,
+        selected_edge=(6, 10), draw_cand_table=True,rows=10,
         candidate_degrees={(6, 10): 8, (3, 6): 8, (3, 9): 7, (9, 10): 7, (6, 9): 7, (3, 1): 7, (6, 1): 7, (1, 10): 7},
         candidates=[(6, 10), (3, 6), (3, 9), (9, 10), (6, 9), (3, 1), (6, 1), (1, 10)], chosen_edges=[]
     )
     # (3, 6)
     plot_graph(
         [(9, 10), (6, 9), (1, 10), (3, 1), (10, 3), (6, 3), (3, 9), (6, 10), (6, 1)],
-        selected_edge=(3, 6), draw_table=True, rows=10,
+        selected_edge=(3, 6), draw_cand_table=True, rows=10,
         candidate_degrees={(6, 10): 8, (3, 6): 8, (3, 9): 7, (9, 10): 7, (6, 9): 7, (3, 1): 7, (6, 1): 7, (1, 10): 7},
         candidates=[(6, 10), (3, 6), (3, 9), (9, 10), (6, 9), (3, 1), (6, 1), (1, 10)], chosen_edges=[]
     )
     plot_graph(
         [(9, 10), (1, 10), (3, 1), (10, 3), (3, 9)],
-        selected_edge=(3, 6),draw_table=True, rows=10,
+        selected_edge=(3, 6), draw_cand_table=True, rows=10,
         candidate_degrees={(6, 10): 8, (3, 6): 8, (3, 9): 7, (9, 10): 7, (6, 9): 7, (3, 1): 7, (6, 1): 7, (1, 10): 7},
         candidates=[(6, 10), (3, 6), (3, 9), (9, 10), (6, 9), (3, 1), (6, 1), (1, 10)], chosen_edges=[(3,6)]
     )
     # (3,9)
     plot_graph(
         [(9, 10), (1, 10), (3, 1), (10, 3), (9, 3)],
-        selected_edge=(3, 9), draw_table=True, rows=10,
+        selected_edge=(3, 9), draw_cand_table=True, rows=10,
         candidate_degrees={(3, 9): 5, (9, 10): 5, (3, 1): 5, (1, 10): 5},
         candidates=[(3, 9), (9, 10), (3, 1), (1, 10)], chosen_edges=[(3,6)]
     )
     plot_graph(
         [(1, 10), (3, 1), (10, 3)],
-        selected_edge=(3,9), draw_table=True, rows=10,
+        selected_edge=(3,9), draw_cand_table=True, rows=10,
         candidate_degrees={(3, 9): 5, (9, 10): 5, (3, 1): 5, (1, 10): 5},
         candidates=[(3, 9), (9, 10), (3, 1), (1, 10)], chosen_edges=[(3,6),(3,9)]
     )
     # (3, 1)
     plot_graph(
         [(1, 10), (1, 3), (10, 3)],
-        selected_edge=(3,1), draw_table=True, rows=10,
+        selected_edge=(3,1), draw_cand_table=True, rows=10,
         candidate_degrees={(3, 1): 4, (1, 10): 4, (10, 3): 4},
         candidates=[(3, 1), (1, 10), (10, 3)], chosen_edges=[(3,6),(3,9)]
     )
     plot_graph(
-        [], draw_table=True, rows=10,
+        [], draw_cand_table=True, rows=10,
         candidate_degrees={},
         candidates=[], chosen_edges=[(3, 6), (3, 9), (3,1)]
     )
