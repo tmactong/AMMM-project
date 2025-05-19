@@ -33,7 +33,7 @@ class Grasp(LocalSearch):
         best_objective, best_solution, best_priorities = 0, [], dict()
         for retry in range(1, self.MaxRetryTimes+1):
             print(f"Retry: {retry}")
-            start_time = int(time.time())
+            start_time = round(time.time()*1000)
             self.initialize_variables()
             """ Greedy Construction Phase"""
             print(f'{"*"*20} Greedy Construction Phase {"*"*20}')

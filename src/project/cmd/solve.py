@@ -61,4 +61,3 @@ if __name__ == '__main__':
     # project 3: 10 members
     #for alpha in (0.1, 0.3, 0.5, 0.7, 0.9):
     #    main('../testdata/project.45members.dat', 'grasp', alpha=alpha)
-    # project 4: 10 members

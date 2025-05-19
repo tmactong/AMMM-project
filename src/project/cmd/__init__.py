@@ -32,7 +32,7 @@ class Solver:
         self.Algorithm = algorithm
         self.Alpha = alpha
         self.DoLocalSearch = do_local_search
-        self.start_time = int(time.time())
+        self.start_time = round(time.time()*1000)
         self.ProjectName = os.path.basename(data_file).lstrip('project.').rstrip('.dat')
 
     def __enter__(self) -> HeuristicMethod:
