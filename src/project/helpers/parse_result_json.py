@@ -3,7 +3,8 @@ import re
 import json
 import typing as t
 
-SolutionFolder = '../result/'
+#SolutionFolder = '../result/'
+SolutionFolder = '../result/grasp_without_local_search_100_iteration'
 
 def get_time_and_objective(method: str):
     times = []
@@ -65,6 +66,7 @@ def grasp_alpha_objecitve():
         print('id\tobjective')
         for alpha in ['0.0','0.1','0.2','0.3','0.4','0.5','0.6','0.7','0.8','0.9','1.0']:
             print(f'{alpha}\t{objectives[i][alpha]}')
+        print('max:', max(objectives[i].values()))
         print('\n')
 
 def main(method: t.Literal['greedy', 'local_search', 'grasp']):
@@ -74,5 +76,5 @@ def main(method: t.Literal['greedy', 'local_search', 'grasp']):
         get_grasp_time_and_objective()
 
 if __name__ == "__main__":
-    #main('greedy')
+    #main('grasp')
     grasp_alpha_objecitve()
