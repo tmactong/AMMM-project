@@ -1,4 +1,6 @@
 import os
+import sys
+
 from PIL import Image
 
 def create_gif(folder:str, output_gif_filename:str):
@@ -25,7 +27,8 @@ def create_gif(folder:str, output_gif_filename:str):
 
 
 if __name__ == '__main__':
-    create_gif(
-        '../assets/image/solution/ts',
-        '../assets/image/ts.gif'
-    )
+    if sys.argv.__len__() < 3:
+        print("Usage: python create_gif.py folder output_gif_filename")
+        print('Example: python create_gif.py ../assets/image/solution/ts ../assets/image/ts.gif')
+        sys.exit(1)
+    create_gif(sys.argv[1], sys.argv[2])

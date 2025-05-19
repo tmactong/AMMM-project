@@ -1,5 +1,5 @@
 import argparse
-from src.project.cmd import Solver, ALGORITHM
+from src.project.cmd import Solver, ALGORITHM, Algorithm
 
 def alpha_type(alpha_value):
     alpha_values = []
@@ -35,30 +35,18 @@ def run_main(data_file: str, algorithm: ALGORITHM, alpha: float = 0, local_searc
 def main():
     parser = get_parser()
     args = parser.parse_args()
-    if args.method == 'greedy':
-        run_main(data_file=args.data_file, algorithm=ALGORITHM.GREEDY, draw=args.draw)
-    elif args.method == 'local_search':
-        run_main(data_file=args.data_file, algorithm=ALGORITHM.LOCAL_SEARCH, draw=args.draw)
-    elif args.method == 'grasp':
+    if args.method == Algorithm.GREEDY:
+        run_main(data_file=args.data_file, algorithm=Algorithm.GREEDY, draw=args.draw)
+    elif args.method == Algorithm.LOCAL_SEARCH:
+        run_main(data_file=args.data_file, algorithm=Algorithm.LOCAL_SEARCH, draw=args.draw)
+    elif args.method == Algorithm.GRASP:
         if not args.alpha:
             raise argparse.ArgumentTypeError("alpha must be specified when using GRASP")
         for alpha in args.alpha:
-            run_main(data_file=args.data_file, algorithm=ALGORITHM.GRASP, alpha=alpha, local_search=args.do_local_search, draw=args.draw)
+            run_main(data_file=args.data_file, algorithm=Algorithm.GRASP, alpha=alpha, local_search=args.do_local_search, draw=args.draw)
     else:
         raise argparse.ArgumentTypeError("invalid method '{}'".format(args.method))
 
 
 if __name__ == '__main__':
-    #main()
-    run_main('../testdata/project.4.dat', 'local_search')
-    # run_main('../testdata/project.4.dat', 'grasp', draw=True, alpha=0.2)
-    # project 6: 8 members
-    #for i in range(1, 11):
-    #    for alpha in (0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1):
-    #        main(f'../testdata/project.45-{i}.dat', 'grasp', alpha, local_search=False)
-    # main('../testdata/project.45members.dat', 'local_search')
-    # project 2: 6 members
-    # project 3: 10 members
-    #for alpha in (0.1, 0.3, 0.5, 0.7, 0.9):
-    #    main('../testdata/project.45members.dat', 'grasp', alpha=alpha)
-    # project 4: 10 members
+    main()
