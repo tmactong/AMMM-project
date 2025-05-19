@@ -6,12 +6,13 @@
 
 
 ### Main structure of the code
-- **[cmd](src/project/cmd) folder**: Contains the main executable program responsible for solving the problem and generating problem instances.
-- **[heuristics](src/project/heuristics) folder**: Includes Python implementations of Greedy, Local Search, and GRASP methods.
-- **[opl](src/project/opl) folder**: Contains the OPL code for the Integer Linear Programming (ILP) model.
-- **[helpers](src/project/helpers) folder**: Comprises useful tools and libraries, including solution validator, graph processor, and more.
-- **[result](src/project/result) folder**: Stores solutions in JSON format.
-- **[testdata](src/project/testdata) folder**: Houses generated problem instances.
+- [cmd](src/project/cmd) folder: Contains the main executable program responsible for solving the problem and generating problem instances.
+- [heuristics](src/project/heuristics) folder: Includes Python implementations of Greedy, Local Search, and GRASP methods.
+- [opl](src/project/opl) folder: Contains the OPL code for the Integer Linear Programming (ILP) model.
+- [helpers](src/project/helpers) folder: Comprises useful tools and libraries, including solution validator, graph processor, and more.
+- [result](src/project/result) folder: Stores solutions in JSON format.
+- [testdata](src/project/testdata) folder: Houses generated problem instances.
+- [sol](src/project/sol) folder: Stores solutions solved by IPL model.
 
 ### Instance Generator
 [**generate_data.py**](src/project/cmd/generate_data.py)
@@ -62,3 +63,11 @@ python solve.py ../testdata/project.45-1.dat --method grasp --max_iteration 10 -
 python solve.py ../testdata/project.45-1.dat --method grasp --max_iteration 100 --alpha 0.1,0.2,0.3 
 ```
 
+### Solution file
+Solution file generated in folder [result](src/project/result)
+For example.
+If using command `python solve.py ../testdata/project.45-1.dat --method greedy`, solution file will be [solution.greedy.objective=4588.json](src/project/result/project.45-1/solution.greedy.objective=4588.json)
+
+#### Solution file format
+
+Solution file is in JSON format with keys: 'Objective', 'Solution', 'MemberPriorities', 'Bids', 'StartTime', and 'EndTime'.
