@@ -1,7 +1,6 @@
+import sys
 import random
-
 MaxBid = 10
-
 
 def generate(dataset_count: int, member_count:int):
     for i in range(dataset_count):
@@ -19,4 +18,6 @@ def generate(dataset_count: int, member_count:int):
 
 
 if __name__ == "__main__":
-    generate(10, 45)
+    if sys.argv.__len__() < 3:
+        print('Usage: python generate_data.py <dataset_count> <member_count>')
+    generate(int(sys.argv[1]), int(sys.argv[2]))

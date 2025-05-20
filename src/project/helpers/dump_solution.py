@@ -30,7 +30,7 @@ def dump_solution(
                     'MemberPriorities': member_priorities,
                     'Bids': bids,
                     'StartTime': start_time,
-                    'EndTime': int(time.time())
+                    'EndTime': round(time.time()*1000)
                 },
                 indent=4
             )

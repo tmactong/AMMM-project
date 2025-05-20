@@ -26,13 +26,16 @@ class Solver:
     start_time: int
 
     def __init__(self, data_file: str, algorithm: ALGORITHM,
-                 alpha: typing.Optional[float] = None, do_local_search: typing.Optional[bool] = None) -> None:
+                 alpha: typing.Optional[float] = None, do_local_search: typing.Optional[bool] = None,
+                 max_iteration: typing.Optional[int] = None
+                 ) -> None:
         self.data_file = data_file
         self.MemberCount, self.Bids = data_parser(self.data_file)
         self.Algorithm = algorithm
         self.Alpha = alpha
         self.DoLocalSearch = do_local_search
-        self.start_time = int(time.time())
+        self.MaxIteration = max_iteration
+        self.start_time = round(time.time()*1000)
         self.ProjectName = os.path.basename(data_file).lstrip('project.').rstrip('.dat')
 
     def __enter__(self) -> HeuristicMethod:
@@ -44,7 +47,8 @@ class Solver:
             self.SolverInstance = LocalSearch(self.MemberCount, self.Bids, self.ProjectName)
         elif self.Algorithm == Algorithm.GRASP:
             self.SolverInstance = Grasp(
-                self.MemberCount, self.Bids, self.ProjectName, alpha=self.Alpha, do_local_search=self.DoLocalSearch)
+                self.MemberCount, self.Bids, self.ProjectName, alpha=self.Alpha,
+                do_local_search=self.DoLocalSearch, max_iteration=self.MaxIteration)
         else:
             raise NotImplementedError
         return self.SolverInstance
