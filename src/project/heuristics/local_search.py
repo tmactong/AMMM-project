@@ -87,22 +87,27 @@ class LocalSearch(GreedyHeuristic):
             return True, potential_increasing_bid - decreasing_bid, knockon_pairs
         return False, 0, []
 
-
     def solve(self) -> None:
         # Greedy Construction Phase
         super().solve()
         improved = True
+        previous_unflipped = []
         while improved:
             improved = False
-            for i,j in self.obtain_pairs_with_higher_bid():
-                if self.Bids[i][j] <= self.Bids[j][i]:
+            pairs_with_higher_bid = list(self.obtain_pairs_with_higher_bid())
+            for idx, (i,j) in enumerate(pairs_with_higher_bid):
+                if (i,j) in self.Solution:
                     # already flipped during the previous process
+                    continue
+                if not improved and (i,j) in previous_unflipped:
+                    # no need to check
                     continue
                 print(f'{"="*20} EXAMINING PAIR {(i,j)} {"=" *20}')
                 print(f'{(i,j)} -> {(j,i)}: {self.Bids[i][j]} -> {self.Bids[j][i]}')
                 flipped, increasing_bid, knockon_pairs = self.flip_pair_with_improvement((i, j))
                 if flipped:
                     improved = True
+                    previous_unflipped = pairs_with_higher_bid[idx+1:]
                     print('Updating Solution...')
                     print(f"Objective: {self.Objective} -> {self.Objective + increasing_bid}")
                     print(f"solution: flipped {(j, i)} -> {(i, j)}")
