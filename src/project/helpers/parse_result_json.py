@@ -3,8 +3,8 @@ import re
 import json
 import typing as t
 
-#SolutionFolder = '../result/'
-SolutionFolder = '../result/grasp_without_local_search_100_iteration'
+SolutionFolder = '../result/'
+
 
 def get_time_and_objective(method: str):
     times = []
@@ -76,5 +76,5 @@ def main(method: t.Literal['greedy', 'local_search', 'grasp']):
         get_grasp_time_and_objective()
 
 if __name__ == "__main__":
-    #main('grasp')
-    grasp_alpha_objecitve()
+    main('grasp')
+    #grasp_alpha_objecitve()
