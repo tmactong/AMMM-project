@@ -7,7 +7,6 @@ from src.project.helpers.dump_solution import dump_solution
 class Grasp(LocalSearch):
 
     Alpha: float
-    MaxRetryTimes: int = 1
     DoLocalSearch: bool = False
     DrawGraph: bool = False
 
@@ -18,12 +17,14 @@ class Grasp(LocalSearch):
             project_name: str,
             alpha: float = 0,
             do_local_search: typing.Optional[bool] = None,
-            draw_graph: bool = False
+            draw_graph: bool = False,
+            max_iteration: int = 10
     ) -> None:
         super().__init__(member_count, bids, project_name)
         self.Alpha = alpha
         self.DoLocalSearch = True if do_local_search else False
         self.DrawGraph = draw_graph
+        self.MaxIteration = max_iteration
 
     def pop_random_candidate_from_rcl(self) -> typing.Tuple[int, int]:
         sorted_candidates = self.sort_candidates_by_quality()
@@ -35,7 +36,7 @@ class Grasp(LocalSearch):
 
     def solve(self) -> None:
         best_objective, best_solution, best_priorities = 0, [], dict()
-        for retry in range(1, self.MaxRetryTimes+1):
+        for retry in range(1, self.MaxIteration+1):
             print(f"Retry: {retry}")
             start_time = int(time.time())
             self.initialize_variables()

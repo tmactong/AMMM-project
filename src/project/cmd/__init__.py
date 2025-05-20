@@ -28,6 +28,7 @@ class Solver:
 
     def __init__(self, data_file: str, algorithm: ALGORITHM,
                  alpha: typing.Optional[float] = None, do_local_search: typing.Optional[bool] = None,
+                 max_iteration: typing.Optional[int] = None,
                  draw_graph: bool = False
                  ) -> None:
         self.data_file = data_file
@@ -35,6 +36,7 @@ class Solver:
         self.Algorithm = algorithm
         self.Alpha = alpha
         self.DoLocalSearch = do_local_search
+        self.MaxIteration = max_iteration
         self.DrawGraph = draw_graph
         self.start_time = int(time.time())
         self.ProjectName = os.path.basename(data_file).lstrip('project.').rstrip('.dat')
@@ -49,7 +51,7 @@ class Solver:
         elif self.Algorithm == Algorithm.GRASP:
             self.SolverInstance = Grasp(
                 self.MemberCount, self.Bids, self.ProjectName, alpha=self.Alpha,
-                do_local_search=self.DoLocalSearch, draw_graph=self.DrawGraph)
+                do_local_search=self.DoLocalSearch, draw_graph=self.DrawGraph,max_iteration=self.MaxIteration)
         else:
             raise NotImplementedError
         return self.SolverInstance
