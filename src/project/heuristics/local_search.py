@@ -68,44 +68,50 @@ class LocalSearch(GreedyHeuristic):
             return False
         return True
 
-    def flip_pairs_with_improvement(self, excluded_pairs: typing.List[typing.Tuple[int, int]]) -> (
-            bool, int, typing.Tuple[int, int], typing.List[typing.Tuple[int, int]]) :
-        print(f'{"#"*20} EXAMINING PAIRS {excluded_pairs} {"#" *20}')
-        for i,j in excluded_pairs:
-            print(f'{"="*20} EXAMINING PAIR {(i,j)} {"=" *20}')
-            print(f'{(i,j)} -> {(j,i)}: {self.Bids[i][j]} -> {self.Bids[j][i]}')
-            potential_increasing_bid = self.Bids[i][j] - self.Bids[j][i]
-            solution = copy.deepcopy(self.Solution)
-            solution[solution.index((j,i))] = i,j
-            residual_edges, indegree, outdegree = trim_graph(solution)
-            if not residual_edges:
-                print('no loops formed')
-                return True, potential_increasing_bid, (i,j), []
-            knockon_pairs, decreasing_bid = self.get_knockon_pairs(
-                potential_increasing_bid, residual_edges, indegree, outdegree)
-            if decreasing_bid == -1:
-                continue
-            print('knockon pairs: ', knockon_pairs, 'decreasing bid: ', decreasing_bid)
-            if self.can_be_flipped((i,j), knockon_pairs):
-                return True, potential_increasing_bid - decreasing_bid, (i,j), knockon_pairs
-        return False, 0, [], []
+    def flip_pair_with_improvement(self, excluded_pair: typing.Tuple[int, int]) -> (
+            bool, int, typing.List[typing.Tuple[int, int]]):
+        i,j = excluded_pair
+        potential_increasing_bid = self.Bids[i][j] - self.Bids[j][i]
+        solution = copy.deepcopy(self.Solution)
+        solution[solution.index((j,i))] = i,j
+        residual_edges, indegree, outdegree = trim_graph(solution)
+        if not residual_edges:
+            print('no loops formed')
+            return True, potential_increasing_bid, []
+        knockon_pairs, decreasing_bid = self.get_knockon_pairs(
+            potential_increasing_bid, residual_edges, indegree, outdegree)
+        if decreasing_bid == -1:
+            return False, 0, []
+        print('knockon pairs: ', knockon_pairs, 'decreasing bid: ', decreasing_bid)
+        if self.can_be_flipped((i,j), knockon_pairs):
+            return True, potential_increasing_bid - decreasing_bid, knockon_pairs
+        return False, 0, []
+
 
     def solve(self) -> None:
+        # Greedy Construction Phase
         super().solve()
-        pairs_with_higher_bid = list(self.obtain_pairs_with_higher_bid())
-        flipped, increased_bid, pair, knocked_on_pairs = self.flip_pairs_with_improvement(pairs_with_higher_bid)
-        while flipped:
-            print('Updating Solution...')
-            print(f"Objective: {self.Objective} -> {self.Objective + increased_bid}")
-            print(f"solution: flipped {pair[::-1]} -> {pair}")
-            self.Solution[self.Solution.index(pair[::-1])] = pair
-            self.Objective += increased_bid
-            self.MemberPriorities[pair[0]][pair[1]] = 1
-            self.MemberPriorities[pair[1]][pair[0]] = 0
-            for candidate in knocked_on_pairs:
-                print(f'solution: flipped {candidate} -> {candidate[::-1]}')
-                self.Solution[self.Solution.index(candidate)] = candidate[::-1]
-                self.MemberPriorities[candidate[0]][candidate[1]] = 0
-                self.MemberPriorities[candidate[1]][candidate[0]] = 1
-            pairs_with_higher_bid = list(self.obtain_pairs_with_higher_bid())
-            flipped, increased_bid, pair, knocked_on_pairs = self.flip_pairs_with_improvement(pairs_with_higher_bid)
+        improved = True
+        while improved:
+            improved = False
+            for i,j in self.obtain_pairs_with_higher_bid():
+                if self.Bids[i][j] <= self.Bids[j][i]:
+                    # already flipped during the previous process
+                    continue
+                print(f'{"="*20} EXAMINING PAIR {(i,j)} {"=" *20}')
+                print(f'{(i,j)} -> {(j,i)}: {self.Bids[i][j]} -> {self.Bids[j][i]}')
+                flipped, increasing_bid, knockon_pairs = self.flip_pair_with_improvement((i, j))
+                if flipped:
+                    improved = True
+                    print('Updating Solution...')
+                    print(f"Objective: {self.Objective} -> {self.Objective + increasing_bid}")
+                    print(f"solution: flipped {(j, i)} -> {(i, j)}")
+                    self.Solution[self.Solution.index((j, i))] = (i, j)
+                    self.Objective += increasing_bid
+                    self.MemberPriorities[i][j] = 1
+                    self.MemberPriorities[j][i] = 0
+                    for m, n in knockon_pairs:
+                        print(f'knockon flipped {(m, n)} -> {(n, m)}')
+                        self.Solution[self.Solution.index((m, n))] = (n, m)
+                        self.MemberPriorities[m][n] = 0
+                        self.MemberPriorities[n][m] = 1
