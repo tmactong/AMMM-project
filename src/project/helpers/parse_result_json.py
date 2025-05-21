@@ -76,5 +76,5 @@ def main(method: t.Literal['greedy', 'local_search', 'grasp']):
         get_grasp_time_and_objective()
 
 if __name__ == "__main__":
-    main('grasp')
+    main('local_search')
     #grasp_alpha_objecitve()

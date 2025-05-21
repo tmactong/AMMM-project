@@ -1,3 +1,4 @@
+import os
 import json
 from src.project.helpers.graph import trim_graph
 
@@ -18,15 +19,14 @@ def validate_solution(solution_file: str) -> None:
 
 
 if __name__ == "__main__":
-    '''
-    path = "../result/project.1/grasp/alpha=0.1"
+
+    path = "../result/project.45-10"
     for file in os.listdir(path):
         if file.startswith('solution'):
             print(f'validate solution file {file}')
             validate_solution(os.path.join(path, file))
             print(f'{"#"*30}')
-    '''
 
-    validate_solution(solution_file="../result/project.45-9/solution.local_search.objective=4870.json")
+    # validate_solution(solution_file="../result/project.45-9/solution.local_search.objective=4870.json")
     # validate_solution("generated_solution.json")
     # print(generate_all_cycles(5))
