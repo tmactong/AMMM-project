@@ -58,7 +58,7 @@ class LocalSearch(GreedyHeuristic):
                 return [], -1
         return chosen_knockon_pairs, total_bid_decrease
 
-    def can_be_flipped(self, pair: typing.Tuple[int, int],knockon_pairs: typing.List[typing.Tuple[int, int]]) -> bool:
+    def can_be_flipped(self, pair: typing.Tuple[int, int], knockon_pairs: typing.List[typing.Tuple[int, int]]) -> bool:
         solution = copy.deepcopy(self.Solution)
         solution[solution.index(pair[::-1])] = pair
         for knockon_pair in knockon_pairs:
@@ -78,9 +78,11 @@ class LocalSearch(GreedyHeuristic):
         if not residual_edges:
             print('no loops formed')
             return True, potential_increasing_bid, []
+        # update cycles
         knockon_pairs, decreasing_bid = self.get_knockon_pairs(
             potential_increasing_bid, residual_edges, indegree, outdegree)
         if decreasing_bid == -1:
+            self.Cycles[(i, j)] = residual_edges
             return False, 0, []
         print('knockon pairs: ', knockon_pairs, 'decreasing bid: ', decreasing_bid)
         if self.can_be_flipped((i,j), knockon_pairs):
@@ -102,6 +104,8 @@ class LocalSearch(GreedyHeuristic):
                 if not improved and (i,j) in previous_unflipped:
                     # no need to check
                     continue
+                if (i, j) in self.Cycles and not set(self.Cycles[(i, j)]) & self.FlippedEdges:
+                    continue
                 print(f'{"="*20} EXAMINING PAIR {(i,j)} {"=" *20}')
                 print(f'{(i,j)} -> {(j,i)}: {self.Bids[i][j]} -> {self.Bids[j][i]}')
                 flipped, increasing_bid, knockon_pairs = self.flip_pair_with_improvement((i, j))
@@ -115,8 +119,15 @@ class LocalSearch(GreedyHeuristic):
                     self.Objective += increasing_bid
                     self.MemberPriorities[i][j] = 1
                     self.MemberPriorities[j][i] = 0
+                    self.FlippedEdges |= {(j,i)}
+                    self.FlippedEdges -= {(j,i)}
                     for m, n in knockon_pairs:
                         print(f'knockon flipped {(m, n)} -> {(n, m)}')
                         self.Solution[self.Solution.index((m, n))] = (n, m)
                         self.MemberPriorities[m][n] = 0
                         self.MemberPriorities[n][m] = 1
+                        self.FlippedEdges |= {(m,n)}
+                        self.FlippedEdges -= {(n,m)}
+                    # update cycles
+                    if (i,j) in self.Cycles:
+                        del self.Cycles[(i,j)]

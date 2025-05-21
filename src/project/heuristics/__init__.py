@@ -11,6 +11,8 @@ class HeuristicMethod:
     MemberPriorities: typing.Dict[typing.Any, typing.Dict[typing.Any, int]]
     Objective: int
     CoveredMembers: typing.Set[int]
+    Cycles: typing.Dict[typing.Tuple[int,int], typing.List[typing.Tuple[int,int]]]
+    FlippedEdges: typing.Set[typing.Tuple[int,int]]
 
     def __init__(self, member_count: int, bids: typing.Dict[int, typing.Dict[int, int]], project_name: str,) -> None:
         self.MemberCount = member_count
@@ -28,6 +30,8 @@ class HeuristicMethod:
         self.Candidates = [(i,j) for i,j in itertools.permutations(range(1, self.MemberCount + 1), 2)
                            if self.Bids[i][j] != 0 or self.Bids[j][i] != 0]
         self.CoveredMembers = set()
+        self.Cycles = dict()
+        self.FlippedEdges = set()
 
     def update_objective(self, pair: typing.Tuple[int, int]) -> None:
         self.Objective += self.Bids[pair[0]][pair[1]]
