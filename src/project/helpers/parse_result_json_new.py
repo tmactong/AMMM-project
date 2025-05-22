@@ -9,8 +9,8 @@ SolutionFolder = '../result/'
 def get_time_and_objective(method: str):
     times = []
     objectives = []
-    for i in range(1,11):
-        folder = f'{SolutionFolder}/project.45-{i}'
+    for i in range(39,46):
+        folder = f'{SolutionFolder}/project.{i}-1'
         files = os.listdir(folder)
         for file in files:
             if file.startswith(f'solution.{method}'):
@@ -20,10 +20,10 @@ def get_time_and_objective(method: str):
                 times.append(solving_time)
                 objectives.append(objective)
     for idx, solving_time in enumerate(times):
-        print(f'{idx+1}\t{solving_time}')
+        print(f'{idx+39}\t{solving_time}')
     print('\n')
     for idx, objective in enumerate(objectives):
-        print(f'{idx+1}\t{objective}')
+        print(f'{idx+39}\t{objective}')
 
 def get_grasp_time_and_objective():
     times = [[] for _ in range(10)]
@@ -76,5 +76,5 @@ def main(method: t.Literal['greedy', 'local_search', 'grasp']):
         get_grasp_time_and_objective()
 
 if __name__ == "__main__":
-    main('grasp')
+    main('local_search')
     #grasp_alpha_objecitve()

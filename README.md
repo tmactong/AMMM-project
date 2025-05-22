@@ -71,3 +71,8 @@ If using command `python solve.py ../testdata/project.45-1.dat --method greedy`,
 #### Solution file format
 
 Solution file is in JSON format with keys: 'Objective', 'Solution', 'MemberPriorities', 'Bids', 'StartTime', and 'EndTime'.
+
+
+### Animation in Slides
+
+Information about the animation in our presentation slides can be found in another branch [draw_picture](https://github.com/tmactong/AMMM-project/tree/draw_picture).
