@@ -13,6 +13,8 @@
 - [result](src/project/result) folder: Stores solutions in JSON format.
 - [testdata](src/project/testdata) folder: Houses generated problem instances.
 - [sol](src/project/sol) folder: Stores solutions solved by IPL model.
+- [report](src/project/report) folder: Stores report latex source code.
+- [presentation](src/project/presentation) folder: Stores presentation latex source code.
 
 ### Instance Generator
 [**generate_data.py**](src/project/cmd/generate_data.py)
