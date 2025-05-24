@@ -331,7 +331,7 @@
 
 
 \setbeamertemplate{section in toc}{
-    \begin{tcolorbox}[tocbox]
+    \begin{tcolorbox}[tocbox, width=0.7\textwidth]
         \inserttocsectionnumber. \inserttocsection
     \end{tcolorbox}
     \vspace{3pt} 
@@ -396,7 +396,7 @@ Advisors:  \\ Prof. Enric Rodriguez and Prof. Luis Velasco
 \section{Problem Identification}
 
 
-\begin{frame}{Topological Sort}
+\begin{frame}{Topological Sort (Kahn's algorithm)}
 
 \begin{alertblock}
 
@@ -416,29 +416,35 @@ Advisors:  \\ Prof. Enric Rodriguez and Prof. Luis Velasco
 
 \begin{frame}[plain]{ILP Model}
 
-
 \begin{alertblock}
     {Decision Variables}
 \centering
-\scalebox{0.9}{$Priority_{ij}: \quad Binary \quad \forall i,j \in Members$}\\
-\scalebox{0.9}{\hspace{0.9cm} $O_{n}: \quad Integer \quad \forall n \in Members$}\\
-\scalebox{0.9}{\hspace{0.25cm} $Income = \sum_{i,j \epsilon Members} Priority_{ij} \cdot m_{ij}$}
+\scalebox{0.8}{$Priority_{ij}: \quad Binary \quad \forall i,j \in Members$}\\
+\scalebox{0.8}{\hspace{0.2cm} $Order_{n}: \quad Integer \quad \forall n \in Members$}\\
 \end{alertblock}
 
 \begin{alertblock}
 {Objective Function}
 \centering
     
-\scalebox{1}{$\textrm{maximize} \quad Income$}
+\scalebox{0.8}{$\textrm{maximize} \quad \sum_{i,j \epsilon Members} Priority_{ij} \cdot m_{ij}$}
+\end{alertblock}
+
+\begin{alertblock}
+\centering
+\scalebox{0.7}{\textit{Each node appears before all the nodes it points to}}
+\scalebox{0.8}{\hspace{4cm} $Priority_{ij} = 1 \quad \rightarrow \quad Order_{i} < Order_{j}$}\\
+\scalebox{0.8}{\hspace{4cm} $Priority_{ij} = 0 \quad \rightarrow \quad Order_{j} < Order_{i}$}
+    
 \end{alertblock}
 
 \begin{alertblock}
     {Constraints}
-\scalebox{0.9}{$Priority_{ij} + Priority_{ji} = 1 $}\\
-\scalebox{0.9}{$\qquad\qquad\qquad\qquad\forall \quad i,j \in Members \quad \textrm{and} \quad m_{ij} + m_{ji} \neq 0$} \qquad(1)\\
+\scalebox{0.8}{$Priority_{ij} + Priority_{ji} = 1 $}\\
+\scalebox{0.8}{$\qquad\qquad\qquad\qquad\forall \quad i,j \in Members \quad \textrm{and} \quad m_{ij} + m_{ji} \neq 0$} \qquad(1)\\
 \scalebox{}{}\\
-\scalebox{0.9}{$O_{i} + 1 \leq O_{j} + (1 - Priority_{ij}) \cdot N $}\\
-\scalebox{0.9}{$\qquad\qquad\qquad\qquad\forall \quad i,j \in Members \quad \textrm{and} \quad m_{ij} + m_{ji} \neq 0$}  \qquad(2)
+\scalebox{0.8}{$Order_{i} + 1 \leq Order_{j} + (1 - Priority_{ij}) \cdot N $}\\
+\scalebox{0.8}{$\qquad\qquad\qquad\qquad\forall \quad i,j \in Members \quad \textrm{and} \quad m_{ij} + m_{ji} \neq 0$}  \qquad(2)
 
 \end{alertblock}
 
@@ -459,7 +465,7 @@ Advisors:  \\ Prof. Enric Rodriguez and Prof. Luis Velasco
 \begin{equation*}
 q(<i,j>, S) = \begin{cases}
     -1 & if \; G(S, <i,j>) \textrm{ is not a directed acyclic graph}\\
-    max(Bids_{ij}, Bids_{ji}) & if \; G(S, <i,j>) \textrm{ is a directed acyclic graph}
+    Bids_{ij} & if \; G(S, <i,j>) \textrm{ is a directed acyclic graph}
     \end{cases}
 \end{equation*}
 }
@@ -473,11 +479,11 @@ q(<i,j>, S) = \begin{cases}
 \begin{algorithmic}
 
 \State $Solution \gets \phi$
-\State $CandidatePairs \gets \{<i,j> \mid i,j \in Members \quad \textrm{and} \quad Bids_{ij} + Bids_{ji} \neq 0\}$
-\While{$CandidatePairs \neq \phi$}
-    \State Evaluate $q(<i',j'>, Solution) \quad \forall <i',j'> \in CandidatePairs$
-    \State $<i,j> \gets argmax\{q(<i', j'>, Solution)\lvert <i', j'> \in CandidatePairs \}$
-    \State $CandidatePairs \gets CandidatePairs \setminus \{<i,j>, <j,i>\}$
+\State $Candidates \gets \{<i,j> \mid i,j \in Members \quad \textrm{and} \quad Bids_{ij} + Bids_{ji} \neq 0\}$
+\While{$Candidates \neq \phi$}
+    \State Evaluate $q(<i',j'>, Solution) \quad \forall <i',j'> \in Candidates$
+    \State $<i,j> \gets argmax\{q(<i', j'>, Solution)\lvert <i', j'> \in Candidates \}$
+    \State $Candidates \gets Candidates \setminus \{<i,j>, <j,i>\}$
     \State $Solution \gets Solution \cup \{<i,j>\}$
 \EndWhile
 \State \Return $Solution$
@@ -488,7 +494,7 @@ q(<i,j>, S) = \begin{cases}
     
 \end{frame}
 
-\begin{frame}{Greedy Constructive Phase (data=project.4.dat)}
+\begin{frame}{Greedy Procedure (data=project.4.dat)}
 
 \centering
 \animategraphics[controls,width=1\linewidth]{2}{images/greedy_resolution/plot-}{001}{049}
@@ -497,19 +503,20 @@ q(<i,j>, S) = \begin{cases}
 
 \section{Local Search Method}
 
+
 \begin{frame}{Local Search Method}
 \begin{minipage}{0.9\textwidth}
 \begin{alertblock}
     {Neighborhood}
 \scalebox{0.7}{
 \begin{equation*}
-\{<i,j> \mid <j,i> \in solution \textrm{ and } Bids_{ij} > Bids_{ji} \}
+\{<i,j> \mid <j,i> \in Solution \textrm{ and } Bids_{ij} > Bids_{ji} \}
 \end{equation*}
 }
 \end{alertblock}
 
 \begin{alertblock}
-    {Knockon Flipped Pairs Cost Function}
+    {Knockon Flipped Edges Cost Function}
 \scalebox{0.7}{
 $q(<i',j'>, edges^{flip})=$\\
 }
@@ -536,7 +543,7 @@ $q(<i',j'>, edges^{flip})=$\\
 
 
 
-\begin{frame}{Knockon Pairs Selection Process}
+\begin{frame}{Knockon Flipped Edges Selection Process}
 
 \centering
 \animategraphics[controls,width=1\linewidth]{2}{images/local_search_graph/plot-}{020}{026}
@@ -590,12 +597,13 @@ $q(<i',j'>, edges^{flip})=$\\
 
 \centering
 %\animategraphics[controls,width=1\linewidth]{2}{images/local_search_resolution/plot-}{001}{002}
-\animategraphics[controls,width=1\linewidth]{2}{images/local_search_resolution/plot-}{001}{036}
+\animategraphics[controls,width=1\linewidth]{2}{images/local_search_resolution/plot-}{001}{035}
     
 \end{frame}
 
 
 \section{GRASP Method}
+
 
 \begin{frame}{Pseudo Code \& RCL}
 
@@ -657,8 +665,8 @@ $q(<i',j'>, edges^{flip})=$\\
 \begin{frame}{GRASP Constructive Phase (data=project.4.dat,$\alpha = 0.2$)}
 
 \centering
-\animategraphics[loop,controls,width=1\linewidth]{2}{images/grasp_resolution/plot-}{001}{002}
-%\animategraphics[loop,controls,width=1\linewidth]{2}{images/grasp_resolution/plot-}{001}{034}
+%\animategraphics[loop,controls,width=1\linewidth]{2}{images/grasp_resolution/plot-}{001}{002}
+\animategraphics[controls,width=1\linewidth]{2}{images/grasp_resolution/plot-}{001}{034}
     
 \end{frame}
 

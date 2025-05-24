@@ -130,7 +130,7 @@ For example, if the pair (2,3) results in an infeasible solution, we assume that
 \begin{displaymath}
     q(<i,j>, S) = \begin{cases}
     -1 & if \quad G(S, <i,j>) \textrm{ is not a DAG}\\
-    max(Bids_{ij}, Bids_{ji}) & if \quad G(S, <i,j>) \textrm{ is a DAG}
+    Bids_{ij} & if \quad G(S, <i,j>) \textrm{ is a DAG}
     \end{cases}
 \end{displaymath}
 
@@ -662,8 +662,7 @@ As demonstrated in \nameref{fig:fig43}, the time required to solve the ILP model
 
 \subsection{Experiment Conclusion}
 
-If the number of members is small (less than 42), we should always apply ILP model to achieve the optimal solution.
-GRASP with 10 iterations and local search yields the best solution among the heuristic methods, but it requires a significant amount of time to compute compared with other methods. To balance solution quality and solving time, we can use GRASP with 100 iterations and no local search, utilizing an \bm{$\alpha$} value between 0 and 0.1 to address the problem, or employ only the local search method.
+If the number of members is small (fewer than 42), we should always use the ILP model to achieve the optimal solution. If the number of members is large (more than 42) and we need a reasonably good solution within a short timeframe, we should apply the GRASP with 10 iterations, followed by a local search procedure. This approach will yield the best solution among the heuristic methods we tested.
 
 \section{Personal Reflections}
 
