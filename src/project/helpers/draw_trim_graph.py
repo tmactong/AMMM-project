@@ -34,7 +34,7 @@ def trim_graph(edges: t.List[t.Tuple[int, int]]) -> (
         t.List[t.Tuple[int, int]], t.Dict[int, int], t.Dict[int, int]):
     vertices = get_vertices_from_edges(edges)
     neighbors = construct_neighbors(vertices, edges)
-    dropped_vertices = set()
+    dropped_vertices = list()
     indegree = dict(map(lambda _: (_, 0), vertices))
     outdegree = dict(map(lambda _: (_, 0), vertices))
     _indegree, _outdegree = calculate_degree(edges)
@@ -56,10 +56,12 @@ def trim_graph(edges: t.List[t.Tuple[int, int]]) -> (
                 if (node, neighbor) in edges:
                     edges.remove((node, neighbor))
                     _indegree, _outdegree = calculate_degree(edges)
-                    dropped_vertices |= set([x for x in vertices if x not in _indegree])
+                    for v in [x for x in vertices if x not in _indegree]:
+                        if v not in dropped_vertices:
+                            dropped_vertices.append(v)
                     for v in _indegree:
                         if _indegree[v] == 0 and _outdegree[v] == 0:
-                            dropped_vertices.add(v)
+                            dropped_vertices.append(v)
                     print(f'removing edge: {(node,neighbor)}')
                     plot_graph(edges, indegree=_indegree, outdegree=_outdegree, draw_degree_table=True,
                                selected_vertex=node, dropped_vertices=dropped_vertices, selected_degree='indegree')
@@ -76,10 +78,13 @@ def trim_graph(edges: t.List[t.Tuple[int, int]]) -> (
                     if (vertex, node) in edges:
                         edges.remove((vertex, node))
                         _indegree, _outdegree = calculate_degree(edges)
-                        dropped_vertices |= set([x for x in vertices if x not in _indegree])
+                        for v in [x for x in vertices if x not in _indegree]:
+                            if v not in dropped_vertices:
+                                print(f'v, {v}')
+                                dropped_vertices.append(v)
                         for v in _indegree:
                             if _indegree[v] == 0 and _outdegree[v] == 0:
-                                dropped_vertices.add(v)
+                                dropped_vertices.append(v)
                         print(f'removing edge: {vertex, node}')
                         plot_graph(
                             edges, indegree=_indegree, outdegree=_outdegree, draw_degree_table=True,
