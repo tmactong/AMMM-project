@@ -449,7 +449,7 @@ project.45-10.dat & 0.2  \\ [1ex]
 \label{table41}
 \end{table}
 
-\noindent As shown in figure \nameref{fig:fig41} and table \nameref{table41}, a better solution is most likely achieved when \bm{$\alpha$} is set from 0 to 0.1. \textbf{In the following experiments, we will set \bm{$\alpha$} equal to 0 when conducting the GRASP method}.
+\noindent As shown in figure \nameref{fig:fig41} and table \nameref{table41}, a better solution is most likely achieved when \bm{$\alpha$} is set from 0 to 0.1. \textbf{In the following experiments, we will set \bm{$\alpha$} equal to 0.1 when conducting the GRASP method to give a good balance between quality and randomness}.
 
 
 \subsection{Solving Time}
@@ -478,7 +478,7 @@ As demonstrated in \nameref{fig:fig43}, the time required to solve the ILP model
     log origin=infty,
     legend pos=outer north east,
     width=0.7\textwidth,
-    legend style={nodes={scale=1, transform shape}}
+    legend style={nodes={scale=0.8, transform shape}}
 ]
 
 
@@ -513,7 +513,7 @@ As demonstrated in \nameref{fig:fig43}, the time required to solve the ILP model
     y=time
 ] {data/45members/solving_time_cplex.dat};
 
-\legend{Greedy,GRASP(100 Iter. w/o local search \bm{$\alpha$} = 0),Local Search,GRASP(10 Iter. w/ local search \bm{$\alpha$} = 0),ILP}
+\legend{Greedy,GRASP(100 Iter. w/o local search \bm{$\alpha$} = 0.1),Local Search,GRASP(10 Iter. w/ local search \bm{$\alpha$} = 0.1),ILP}
 \end{axis}
 \end{tikzpicture}
 \captionsetup{labelformat=empty}
@@ -540,7 +540,7 @@ As demonstrated in \nameref{fig:fig43}, the time required to solve the ILP model
     log origin=infty,
     legend pos=outer north east,
     width=0.7\textwidth,
-    legend style={nodes={scale=1, transform shape}}
+    legend style={nodes={scale=0.8, transform shape}}
 ]
 
 
@@ -575,7 +575,7 @@ As demonstrated in \nameref{fig:fig43}, the time required to solve the ILP model
     y=time
 ] {data/variable_members/solving_time_cplex.dat};
 
-\legend{Greedy,GRASP(100 Iter. w/o local search \bm{$\alpha$} = 0),Local Search,GRASP(10 Iter. w/ local search \bm{$\alpha$} = 0),ILP}
+\legend{Greedy,GRASP(100 Iter. w/o local search \bm{$\alpha$} = 0.1),Local Search,GRASP(10 Iter. w/ local search \bm{$\alpha$} = 0.1),ILP}
 \end{axis}
 \end{tikzpicture}
 \captionsetup{labelformat=empty}
@@ -604,7 +604,7 @@ As demonstrated in \nameref{fig:fig43}, the time required to solve the ILP model
     grid style=dashed,
     width=0.7\textwidth,
     legend pos=outer north east,
-    legend style={nodes={scale=1, transform shape}}
+    legend style={nodes={scale=0.8, transform shape}}
 ]
 
 \addplot[green,thick,mark=triangle] table {data/45members/objective_greedy.dat};
@@ -614,7 +614,7 @@ As demonstrated in \nameref{fig:fig43}, the time required to solve the ILP model
 \addplot[red,thick,mark=square*] table {data/45members/objective_cplex.dat};
 
 
-\legend{Greedy,GRASP(100 Iter. w/o local search  $\alpha = 0$),Local Search,GRASP(10 Iter. w/ local search $\alpha = 0$),ILP(Optimal)}
+\legend{Greedy,GRASP(100 Iter. w/o local search  $\alpha = 0.1$),Local Search,GRASP(10 Iter. w/ local search $\alpha = 0.1$),ILP(Optimal)}
     
 \end{axis}
 \end{tikzpicture}
@@ -638,7 +638,7 @@ As demonstrated in \nameref{fig:fig43}, the time required to solve the ILP model
     grid style=dashed,
     width=0.7\textwidth,
     legend pos=outer north east,
-    legend style={nodes={scale=1, transform shape}}
+    legend style={nodes={scale=0.8, transform shape}}
 ]
 
 \addplot[green,thick,mark=triangle] table {data/variable_members/objective_greedy.dat};
@@ -648,7 +648,7 @@ As demonstrated in \nameref{fig:fig43}, the time required to solve the ILP model
 \addplot[red,thick,mark=square*] table {data/variable_members/objective_cplex.dat};
 
 
-\legend{Greedy,GRASP(100 Iter. w/o local search  $\alpha = 0$),Local Search,GRASP(10 Iter. w/ local search $\alpha = 0$),ILP(Optimal)}
+\legend{Greedy,GRASP(100 Iter. w/o local search  $\alpha = 0.1$),Local Search,GRASP(10 Iter. w/ local search $\alpha = 0.1$),ILP(Optimal)}
     
 \end{axis}
 \end{tikzpicture}

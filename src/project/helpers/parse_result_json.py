@@ -29,7 +29,7 @@ def get_grasp_time_and_objective():
     times = [[] for _ in range(10)]
     objectives = []
     for i in range(1,11):
-        folder = f'{SolutionFolder}/project.45-{i}/grasp/alpha=0.0'
+        folder = f'{SolutionFolder}/project.45-{i}/grasp/alpha=0.1'
         files = os.listdir(folder)
         for file in files:
             if file.startswith(f'solution.grasp.try='):

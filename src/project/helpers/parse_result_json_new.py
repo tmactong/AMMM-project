@@ -26,21 +26,21 @@ def get_time_and_objective(method: str):
         print(f'{idx+39}\t{objective}')
 
 def get_grasp_time_and_objective():
-    times = [[] for _ in range(10)]
+    times = [[] for _ in range(7)]
     objectives = []
-    for i in range(1,11):
-        folder = f'{SolutionFolder}/project.45-{i}/grasp/alpha=0.0'
+    for i in range(39,46):
+        folder = f'{SolutionFolder}/project.{i}-1/grasp/alpha=0.1'
         files = os.listdir(folder)
         for file in files:
             if file.startswith(f'solution.grasp.try='):
                 solution_json = json.load(open(os.path.join(folder, file)))
                 solving_time = (solution_json['EndTime'] - solution_json['StartTime']) / 1000
-                times[i-1].append(solving_time)
+                times[i-39].append(solving_time)
     for idx, solving_times in enumerate(times):
-        print(f'{idx+1}\t{sum(solving_times)}')
-    for i in range(1,11):
+        print(f'{idx+39}\t{sum(solving_times)}')
+    for i in range(39,46):
         best_objective = 0
-        folder = f'{SolutionFolder}/project.45-{i}'
+        folder = f'{SolutionFolder}/project.{i}-1'
         for file in os.listdir(folder):
             if file.startswith(f'solution.grasp.alpha='):
                 objective = json.load(open(os.path.join(folder, file)))['Objective']
@@ -48,7 +48,7 @@ def get_grasp_time_and_objective():
                     best_objective = objective
         objectives.append(best_objective)
     for idx, objective in enumerate(objectives):
-        print(f'{idx+1}\t{objective}')
+        print(f'{idx+39}\t{objective}')
 
 
 def grasp_alpha_objecitve():
@@ -76,5 +76,5 @@ def main(method: t.Literal['greedy', 'local_search', 'grasp']):
         get_grasp_time_and_objective()
 
 if __name__ == "__main__":
-    main('local_search')
+    main('grasp')
     #grasp_alpha_objecitve()
