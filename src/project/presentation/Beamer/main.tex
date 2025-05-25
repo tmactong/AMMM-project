@@ -505,24 +505,34 @@ q(<i,j>, S) = \begin{cases}
 
 
 \begin{frame}{Local Search Method}
-\begin{minipage}{0.9\textwidth}
+\begin{minipage}{1\textwidth}
 \begin{alertblock}
-    {Neighborhood}
-\scalebox{0.7}{
+    {Target Edges}
+\scalebox{0.6}{
 \begin{equation*}
 \{<i,j> \mid <j,i> \in Solution \textrm{ and } Bids_{ij} > Bids_{ji} \}
 \end{equation*}
 }
 \end{alertblock}
 
+\vspace{-0.5em}
+\begin{alertblock}
+    {Neighborhood}
+\scalebox{0.7}{
+Solutions obtained by swapping target edges not included in the solution with their flipped counterparts}\\
+\scalebox{0.7}{
+that are included in the solution.
+}
+\end{alertblock}
+\vspace{-0.5em}
+
 \begin{alertblock}
     {Knockon Flipped Edges Cost Function}
-\scalebox{0.7}{
+\scalebox{0.6}{
 $q(<i',j'>, edges^{flip})=$\\
-}
-\newline
-\newline
-\scalebox{0.7}{
+}\\
+\vspace{2.5mm}
+\scalebox{0.6}{
 \begin{equation*}
 \begin{cases}
     -1 & \\
@@ -593,7 +603,7 @@ $q(<i',j'>, edges^{flip})=$\\
 
 \end{frame}
 
-\begin{frame}{Local Search Phase (data=project.4.dat)}
+\begin{frame}{Local Search Procedure (data=project.4.dat)}
 
 \centering
 %\animategraphics[controls,width=1\linewidth]{2}{images/local_search_resolution/plot-}{001}{002}
@@ -809,7 +819,7 @@ $q(<i',j'>, edges^{flip})=$\\
 \addplot[red,thick,mark=square*] table {data/objective_cplex.dat};
 
 
-\legend{Greedy,GRASP(100 Iter. w/o local search  $\alpha = 0.1$),Local Search,GRASP(10 Iter. w/ local search $\alpha = 0.1$),ILP(Optimal)}
+\legend{Greedy,GRASP(100 Iter. w/o local search  $\alpha = 0.1$),Local Search,GRASP(10 Iter. w/ local search $\alpha = 0.1  $),ILP(Optimal)}
     
 \end{axis}
 \end{tikzpicture}
