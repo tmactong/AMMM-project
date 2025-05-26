@@ -569,7 +569,7 @@ $q(<i',j'>, edges^{flip})=$\\
 \begin{algorithm}[H]
 \renewcommand{\thealgorithm}{}
 \caption{Local Search Method}
-\scriptsize
+\tiny
 \begin{algorithmic}
 
 \State $solution^{current} \gets doGreedyConstructionPhase()$
@@ -577,16 +577,18 @@ $q(<i',j'>, edges^{flip})=$\\
 \While{$improved = $ True}
     \State $improved \gets$ False
     \For{\textbf{each} $<i,j> \in  \{<i,j> \mid <j,i> \in solution^{current} \textrm{ and } bids_{ij} > bids_{ji}\}$}
-    \State $edges^{residual} \gets doTopologicalSort()$
+    \State $solution^{flip} \gets solution^{current}$
+    \State Swap $<j,i>$ with $<i,j>$ in $solution^{flip}$
+    \State $edges^{residual} \gets doTopologicalSort(solution^{flip})$
     \State $edges^{candidate}, edges^{flip}  \gets edges^{residual}, \phi$
     \While{$edges^{residual} \neq \phi$}
         \State Evaluate $q(<i',j'>, edges^{flip}) \quad \forall <i',j'> \in edges^{candidate}$
         \State $<i'',j''> \gets argmax\{q(<i',j'>, edges^{flip}) \mid <i',j'> \in edges^{candidate}\}$
-        \State $edges^{residual} \gets doTopologicalSort()$
+        \State Swap $<i'',j''>$ with $<j'',i''>$ in $edges^{residual}$
+        \State $edges^{residual} \gets doTopologicalSort(edges^{residual})$
         \State $edges^{candidate} \gets edges^{residual}$
         \State $edges^{flip} \gets edges^{flip} \cup \{<i'',j''>\}$
     \EndWhile
-    \State $solution^{flip} \gets solution^{current}$
     \State Swap $<j',i'>$ with $<i',j'>$ in $solution^{flip} \quad \forall <i',j'> \in edges^{flip}$
     \If{$G(solution^{flip})$ is a DAG}
         \State $improved \gets$ True
